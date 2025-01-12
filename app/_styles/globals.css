@@ -1,0 +1,4 @@
+/* Customizando o react-datepicker */
+.custom-datepicker .react-datepicker__year-dropdown {
+  display: none !important;
+}
