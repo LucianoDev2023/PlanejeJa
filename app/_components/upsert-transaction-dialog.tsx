@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import {
-  TRANSACTION_CATEGORY_OPTIONS,
+  getTransactionCategoryOptions,
   TRANSACTION_PAYMENT_METHOD_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
 } from "../_constants/transactions";
@@ -56,13 +56,16 @@ const formSchema = z.object({
   name: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  amount: z
-    .number({
-      required_error: "O valor é obrigatório.",
-    })
-    .positive({
-      message: "O valor deve ser positivo.",
-    }),
+  amount: z.preprocess(
+    (val) => (val === "" ? null : val), // Converte a string vazia para null
+    z
+      .number({
+        required_error: "O valor é obrigatório.",
+      })
+      .positive({
+        message: "Digite o valor da transação.",
+      }),
+  ),
   type: z.nativeEnum(TransactionType, {
     required_error: "O tipo é obrigatório.",
   }),
@@ -89,7 +92,7 @@ const UpsertTransactionDialog = ({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
-      amount: 10,
+      amount: 0,
       category: TransactionCategory.OTHER,
       date: date ? new Date(date) : new Date(),
       name: "",
@@ -228,7 +231,9 @@ const UpsertTransactionDialog = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {TRANSACTION_CATEGORY_OPTIONS.map((option) => (
+                            {getTransactionCategoryOptions(
+                              form.watch("type"),
+                            ).map((option) => (
                               <SelectItem
                                 key={option.value}
                                 value={option.value}

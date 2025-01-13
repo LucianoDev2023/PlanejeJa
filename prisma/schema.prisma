@@ -38,10 +38,12 @@ enum TransactionCategory {
   FOOD
   ENTERTAINMENT
   HEALTH
-  UTILITY
+  INVESTMENT
   SALARY
   EDUCATION
   OTHER
+  INTEREST 
+
 }
 
 enum TransactionPaymentMethod {

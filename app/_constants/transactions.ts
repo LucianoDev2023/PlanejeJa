@@ -22,8 +22,9 @@ export const TRANSACTION_CATEGORY_LABELS = {
   HOUSING: "Moradia",
   OTHER: "Outros",
   SALARY: "Salário",
+  INTEREST: "Rendimentos",
   TRANSPORTATION: "Transporte",
-  UTILITY: "Utilidades",
+  INVESTMENT: "Poupança",
 };
 
 export const TRANSACTION_PAYMENT_METHOD_LABELS = {
@@ -43,7 +44,7 @@ export const TRANSACTION_TYPE_OPTIONS = [
   },
   {
     value: TransactionType.DEPOSIT,
-    label: "Depósito",
+    label: "Renda",
   },
   {
     value: TransactionType.INVESTMENT,
@@ -120,7 +121,83 @@ export const TRANSACTION_CATEGORY_OPTIONS = [
     label: TRANSACTION_CATEGORY_LABELS[TransactionCategory.TRANSPORTATION],
   },
   {
-    value: TransactionCategory.UTILITY,
-    label: TRANSACTION_CATEGORY_LABELS[TransactionCategory.UTILITY],
+    value: TransactionCategory.INVESTMENT,
+    label: TRANSACTION_CATEGORY_LABELS[TransactionCategory.INVESTMENT],
+  },
+  {
+    value: TransactionCategory.INTEREST,
+    label: TRANSACTION_CATEGORY_LABELS[TransactionCategory.INTEREST],
   },
 ];
+
+export const getTransactionCategoryOptions = (type: TransactionType) => {
+  // Se o tipo de transação for 'DEPOSIT' (Renda), retornar categorias 'Outros' e 'Salário'
+  if (type === TransactionType.DEPOSIT) {
+    return [
+      {
+        value: TransactionCategory.OTHER,
+        label: "Outros",
+      },
+      {
+        value: TransactionCategory.SALARY,
+        label: "Salário",
+      },
+      {
+        value: TransactionCategory.INTEREST,
+        label: "Rendimentos",
+      },
+    ];
+  }
+
+  // Se o tipo de transação for 'EXPENSE' (Despesa), retornar categorias comuns
+  if (type === TransactionType.EXPENSE) {
+    return [
+      {
+        value: TransactionCategory.EDUCATION,
+        label: "Educação",
+      },
+      {
+        value: TransactionCategory.ENTERTAINMENT,
+        label: "Entretenimento",
+      },
+      {
+        value: TransactionCategory.FOOD,
+        label: "Alimentação",
+      },
+      {
+        value: TransactionCategory.HEALTH,
+        label: "Saúde",
+      },
+      {
+        value: TransactionCategory.HOUSING,
+        label: "Moradia",
+      },
+      {
+        value: TransactionCategory.TRANSPORTATION,
+        label: "Transporte",
+      },
+    ];
+  }
+
+  // Se o tipo de transação for 'INVESTMENT' (Investimento), retornar categorias 'Investimentos' e 'Outros'
+  if (type === TransactionType.INVESTMENT) {
+    return [
+      {
+        value: TransactionCategory.OTHER,
+        label: "Outros",
+      },
+      {
+        value: TransactionCategory.INVESTMENT,
+        label: "Poupança",
+      },
+    ];
+  }
+
+  // Se o tipo de transação não for nenhum dos casos anteriores, retornar as categorias padrão
+  return [
+    {
+      value: TransactionCategory.OTHER,
+      label: "Outros",
+    },
+  ];
+};
