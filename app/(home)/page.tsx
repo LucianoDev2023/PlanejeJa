@@ -94,7 +94,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
                 <Card className="m-0 flex h-full items-center justify-center bg-gradient-to-b from-[#131d27] to-[#040b11] p-0 sm:w-full">
                   <div className="flex flex-col gap-2">
                     <p className="text-center text-xs text-gray-500">
-                      Gráfico indisponível
+                      Sem dados para o mês selecionado
                     </p>
                     <p className="text-sm text-gray-500">
                       Comece hoje seus lançamentos
