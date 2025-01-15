@@ -28,11 +28,26 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
     : "Selecione uma data...";
 
   // Função para fechar o Popover após selecionar uma data
-  const handleDateSelect: SelectSingleEventHandler = (date, selectedDay, activeModifiers, e) => {
+  const handleDateSelect: SelectSingleEventHandler = (
+    date,
+    selectedDay,
+    activeModifiers,
+    e,
+  ) => {
     if (date && onChange) {
       onChange(date, selectedDay, activeModifiers, e); // Passa todos os 4 parâmetros esperados
       setIsOpen(false); // Fecha o Popover
     }
+  };
+
+  const handleOpenPopover = () => {
+    setIsOpen(true);
+    setTimeout(() => {
+      const popoverContent = document.querySelector('[data-state="open"]');
+      if (popoverContent) {
+        popoverContent.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   };
 
   return (
@@ -45,18 +60,22 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
               "w-full justify-start text-left font-normal",
               !value && "text-muted-foreground",
             )}
-            onClick={() => setIsOpen(true)} // Abre o Popover quando o botão é clicado
+            onClick={handleOpenPopover} // Abre o Popover quando o botão é clicado
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {formattedDate}
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="z-50 w-auto p-0" align="center">
+      <PopoverContent
+        className="z-50 w-full p-0 sm:w-auto"
+        align="center"
+        style={{ maxHeight: "80vh", overflowY: "auto" }} // Permite rolar o conteúdo no dispositivo móvel
+      >
         <Calendar
           mode="single"
           selected={value}
-          onSelect={handleDateSelect}  // Passa a função para selecionar a data
+          onSelect={handleDateSelect} // Passa a função para selecionar a data
           locale={ptBR}
           initialFocus
         />
