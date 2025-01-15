@@ -117,7 +117,7 @@ const SubscriptionPage = async () => {
                     <span className="sm:text-2xl md:text-3xl">R$</span>
                     <div>
                       <span className="text-lg font-semibold sm:text-3xl md:text-4xl">
-                        12
+                        14
                       </span>
                       <span className="text-sm font-semibold sm:text-lg md:text-2xl">
                         ,90
@@ -127,7 +127,7 @@ const SubscriptionPage = async () => {
                     <div className="text-muted-foreground">/mês</div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6 py-8">
+                <CardContent className="space-y-6 bg-gradient-to-t from-[#1a2a3a] to-[#040b11] py-8">
                   <div className="flex items-center gap-2">
                     <CheckIcon className="text-primary" size={20} />
                     <p className="text-sm">Transações ilimitadas</p>
