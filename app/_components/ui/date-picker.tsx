@@ -6,13 +6,14 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/app/_lib/utils";
 import { Button } from "./button";
-import { Calendar } from "./calendar";
+
 import { ActiveModifiers, SelectSingleEventHandler } from "react-day-picker";
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogTrigger,
 } from "./alert-dialog";
+import { Calendar } from "./calendar";
 
 interface DatePickerProps {
   value: Date;
@@ -93,7 +94,7 @@ export const DatePicker = ({ value, onChange }: DatePickerProps) => {
           onSelect={handleSelectDate}
           locale={ptBR}
           initialFocus
-          month={new Date(year, month)} // Passa o mês e ano para o calendário
+          month={new Date(year, month)} // Passa o mês e ano ajustado para o calendário
         />
       </AlertDialogContent>
     </AlertDialog>

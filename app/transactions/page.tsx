@@ -39,12 +39,17 @@ const TransactionsPage = async ({
       `?month=${new Date().getMonth() + 1}&year=${new Date().getFullYear()}&type=${transactionType}`,
     );
   }
+  const yearNum = parseInt(year, 10);
+  const monthNum = parseInt(month, 10) - 1;
+  const startDate = new Date(yearNum, monthNum, 1);
+  const endDate = new Date(yearNum, monthNum + 1, 1);
+
   const transactions = await db.transaction.findMany({
     where: {
       userId,
       date: {
-        gte: new Date(`${year}-${month || "01"}-01`), // Mês inicial
-        lt: new Date(`${year}-${month || "01"}-31`), // Mês final (aproximado)
+        gte: startDate,
+        lt: endDate,
       },
       // Garantir que 'type' seja um valor válido do enum 'TransactionType' ou undefined
       ...(transactionType !== "Todos" && {
