@@ -13,7 +13,7 @@ export function FaqPlano() {
       className="w-full items-center justify-center p-5 sm:m-0 sm:w-1/2"
     >
       <AccordionItem value="item-1">
-        <AccordionTrigger>O que é a plataforma PlanejeJa?</AccordionTrigger>
+        <AccordionTrigger>O que é a plataforma PlanejeJá?</AccordionTrigger>
         <AccordionContent>
           A plataforma PlanejeJa é uma solução digital projetada para ajudar
           você a monitorar, organizar e gerenciar suas receitas e despesas. Seu
@@ -34,9 +34,10 @@ export function FaqPlano() {
       <AccordionItem value="item-3">
         <AccordionTrigger>Quais planos estão disponíveis?</AccordionTrigger>
         <AccordionContent>
-          Oferecemos dois planos para atender às suas necessidades: • Plano
-          Básico: Gratuito, disponível automaticamente ao criar sua conta. •
-          Plano Premium: Requer uma assinatura paga e oferece recursos
+          Oferecemos dois planos para atender às suas necessidades:
+          <br /> • Plano Básico: Gratuito, disponível automaticamente ao criar
+          sua conta.
+          <br /> • Plano Premium: Requer uma assinatura paga e oferece recursos
           adicionais, como relatórios avançados gerados por IA, lançamentos
           ilimitados de transações, entre outros.
         </AccordionContent>
