@@ -6,97 +6,61 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "@/app/_lib/utils";
 import { Button } from "./button";
-
-import { ActiveModifiers, SelectSingleEventHandler } from "react-day-picker";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTrigger,
-} from "./alert-dialog";
 import { Calendar } from "./calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { SelectSingleEventHandler } from "react-day-picker";
+import { FormControl } from "./form";
 
 interface DatePickerProps {
-  value: Date;
+  value?: Date;
   onChange?: SelectSingleEventHandler;
 }
 
-export const DatePicker = ({ value, onChange }: DatePickerProps) => {
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const calendarRef = React.useRef<HTMLDivElement | null>(null);
+export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleSelectDate = (
-    day: Date | undefined,
-    selectedDay: Date,
-    activeModifiers: ActiveModifiers,
-    e: React.MouseEvent,
-  ) => {
-    // A partir daqui você pode realizar qualquer lógica adicional com os parâmetros.
-    if (onChange) {
-      onChange(day, selectedDay, activeModifiers, e); // Passa todos os parâmetros para o onChange original
-    }
-    setIsDialogOpen(false); // Fecha o AlertDialog quando a data for selecionada
-  };
+  const formattedDate = value
+    ? new Date(value).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })
+    : "Selecione uma data...";
 
-  // Função para fechar o calendário ao clicar fora
-  const handleClickOutside = (e: MouseEvent) => {
-    if (
-      calendarRef.current &&
-      !calendarRef.current.contains(e.target as Node)
-    ) {
-      setIsDialogOpen(false); // Fecha o calendário
+  // Função para fechar o Popover após selecionar uma data
+  const handleDateSelect: SelectSingleEventHandler = (date, selectedDay, activeModifiers, e) => {
+    if (date && onChange) {
+      onChange(date, selectedDay, activeModifiers, e); // Passa todos os 4 parâmetros esperados
+      setIsOpen(false); // Fecha o Popover
     }
   };
-
-  // Adiciona o listener para o clique fora
-  React.useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // Extrai o mês e ano da data, ou usa a data atual como fallback
-  const month = value ? new Date(value).getMonth() : new Date().getMonth();
-  const year = value ? new Date(value).getFullYear() : new Date().getFullYear();
 
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !value && "text-muted-foreground",
-          )}
-          onClick={() => setIsDialogOpen(true)} // Abre o dialog ao clicar
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {/* Mostra o tipo de "value" */}
-          {value ? (
-            new Date(value).toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            })
-          ) : (
-            <span>Selecione uma data...</span>
-          )}
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent
-        className="h-auto w-auto rounded-lg"
-        ref={calendarRef}
-      >
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <FormControl>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !value && "text-muted-foreground",
+            )}
+            onClick={() => setIsOpen(true)} // Abre o Popover quando o botão é clicado
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {formattedDate}
+          </Button>
+        </FormControl>
+      </PopoverTrigger>
+      <PopoverContent className="z-50 w-auto p-0" align="center">
         <Calendar
           mode="single"
           selected={value}
-          onSelect={handleSelectDate}
+          onSelect={handleDateSelect}  // Passa a função para selecionar a data
           locale={ptBR}
           initialFocus
-          month={new Date(year, month)} // Passa o mês e ano ajustado para o calendário
         />
-      </AlertDialogContent>
-    </AlertDialog>
+      </PopoverContent>
+    </Popover>
   );
 };

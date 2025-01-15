@@ -281,7 +281,7 @@ const UpsertTransactionDialog = ({
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Data</FormLabel>
                     <DatePicker
                       value={field.value ? new Date(field.value) : new Date()}
