@@ -24,7 +24,6 @@ function Calendar({
   const initialMonth = propMonth ? new Date(propMonth) : new Date();
 
   // Estado para controlar o mês atual
-  const [currentMonth, setCurrentMonth] = React.useState(initialMonth);
 
   // Função para navegar para o mês anterior
   const handlePreviousMonth = () => {
