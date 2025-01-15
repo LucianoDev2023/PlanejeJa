@@ -22,9 +22,19 @@ export const getDashboardTotal = async (
 
   // Caso 1: Quando a opção é "Mensal" e temos ano e mês
   if (opcao === "mensal" && year && month) {
+    // Converte year e month de string para número
+    const yearNum = parseInt(year, 10);
+    const monthNum = parseInt(month, 10) - 1; // Subtrai 1, pois o mês em JavaScript é zero-indexado
+
+    const startDate = new Date(yearNum, monthNum, 1); // Primeiro dia do mês
+    // const endDate = new Date(yearNum, monthNum + 1, 0); // Último dia do mês
+
+    // Defina a data limite como o primeiro dia do próximo mês (fevereiro)
+    const nextMonth = new Date(yearNum, monthNum + 1, 1);
+
     where.date = {
-      gte: new Date(`${year}-${month}-01`),
-      lt: new Date(`${year}-${month}-31`), // Aqui você pode ajustar para o último dia do mês, se necessário
+      gte: startDate,
+      lt: nextMonth, // Inclui todos os dias até o último dia do mês
     };
   }
   // Caso 2: Quando a opção é "Anual" e temos apenas o ano
