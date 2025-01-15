@@ -7,7 +7,7 @@ import { Badge } from "../_components/ui/badge";
 import { getCurrentMonthTransactions } from "../_data/get-current-month-transactions";
 import { ScrollArea } from "../_components/ui/scroll-area";
 import PaymentButton from "./_components/payment-button";
-import { FaqPlano } from "../transactions/_components/faq";
+import { FaqPlano } from "./_components/faq";
 
 const SubscriptionPage = async () => {
   const { userId } = await auth();
@@ -57,7 +57,7 @@ const SubscriptionPage = async () => {
                     <div className="text-muted-foreground">/mês</div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6 bg-gradient-to-t from-[#1a2a3a] to-[#040b11] py-8">
+                <CardContent className="space-y-6 py-8">
                   {currentMonthTransactions === 10 && !hasPremiumPlan && (
                     <div className="flex items-center gap-2">
                       <HandIcon className="text-red-600" size={16} />
@@ -127,7 +127,7 @@ const SubscriptionPage = async () => {
                     <div className="text-muted-foreground">/mês</div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6 bg-gradient-to-t from-[#1a2a3a] to-[#040b11] py-8">
+                <CardContent className="space-y-6 py-8">
                   <div className="flex items-center gap-2">
                     <CheckIcon className="text-primary" size={20} />
                     <p className="text-sm">Transações ilimitadas</p>
