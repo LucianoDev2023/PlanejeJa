@@ -114,7 +114,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
                 </Card>
               ) : (
                 <div className="flex h-full w-full flex-col gap-2">
-                  <p className="mt-2 pb-2 font-sans font-normal sm:m-0 sm:pl-2">
+                  <p className="font-sans font-normal sm:m-0 sm:pl-2">
                     Movimentação financeira no período selecionado{" "}
                   </p>
                   <TransactionsPieChart
