@@ -117,7 +117,7 @@ const SubscriptionPage = async () => {
                     <span className="sm:text-2xl md:text-3xl">R$</span>
                     <div>
                       <span className="text-lg font-semibold sm:text-3xl md:text-4xl">
-                        14
+                        12
                       </span>
                       <span className="text-sm font-semibold sm:text-lg md:text-2xl">
                         ,90
