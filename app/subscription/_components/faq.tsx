@@ -15,7 +15,7 @@ export function FaqPlano() {
       >
         <div className="space-y-1">
           <AccordionItem value="item-1 ">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger>
                 O que é a plataforma PlanejeJá?
               </AccordionTrigger>
@@ -29,7 +29,7 @@ export function FaqPlano() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2 p-2">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger className="text-left">
                 Preciso entender alguma coisa sobre controle financeiro para
                 aproveitar a plataforma?
@@ -42,7 +42,7 @@ export function FaqPlano() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3 p-2">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger>
                 Quais os planos estão disponíveis?
               </AccordionTrigger>
@@ -60,7 +60,7 @@ export function FaqPlano() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger>
                 Quais são as formas de pagamento?
               </AccordionTrigger>
@@ -71,7 +71,7 @@ export function FaqPlano() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-5">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger className="text-left">
                 Como funciona a renovação da assinatura?
               </AccordionTrigger>
@@ -84,7 +84,7 @@ export function FaqPlano() {
           </AccordionItem>
 
           <AccordionItem value="item-6">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger>
                 Há limite para relatórios de IA?
               </AccordionTrigger>
@@ -98,7 +98,7 @@ export function FaqPlano() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-7">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger className="text-left">
                 A plataforma funciona em dispositivos móveis?
               </AccordionTrigger>
@@ -112,14 +112,14 @@ export function FaqPlano() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-8">
-            <div className="rounded-lg bg-gray-700 px-2">
+            <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger className="text-left">
                 Como faço para cancelar minha assinatura?
               </AccordionTrigger>
             </div>
             <AccordionContent className="p-1">
               Você pode cancelar a sua conta na própria plataforma. Não há taxa
-              de cancelamento , e você pode começar ou encerrar a sua assinatura
+              de cancelamento, e você pode começar ou encerrar a sua assinatura
               a qualquer momento.
             </AccordionContent>
           </AccordionItem>
