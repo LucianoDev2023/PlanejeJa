@@ -43,6 +43,17 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
   }
 
   const dashboard = await getDashboardTotal(month, year, opcao);
+  const movFinanceiraTotal = dashboard.balanceSun;
+
+  function formatarParaMoedaBrasil(valor: number) {
+    // Formatando o número para moeda brasileira
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  const valorFormatado = formatarParaMoedaBrasil(movFinanceiraTotal);
 
   const limit_years = await getYearLimits();
   const userCanAddTransaction = await canUserAddTransaction();
@@ -103,6 +114,10 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
                 </Card>
               ) : (
                 <div className="flex h-full w-full flex-col gap-2">
+                  <p className="mt-2 pb-2 font-sans font-normal sm:m-0 sm:pl-2">
+                    Movimentação financeira no período selecionado{" "}
+                    {valorFormatado}
+                  </p>
                   <TransactionsPieChart {...dashboard} />
                 </div>
               )}
