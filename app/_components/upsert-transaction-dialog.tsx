@@ -169,7 +169,11 @@ const UpsertTransactionDialog = ({
                     <FormControl>
                       <MoneyInput
                         placeholder="Digite o valor..."
-                        value={field.value}
+                        value={
+                          field.value
+                            ? field.value.toFixed(2).replace(".", ",")
+                            : "0,00"
+                        }
                         onValueChange={({ floatValue }) =>
                           field.onChange(floatValue)
                         }
@@ -283,10 +287,12 @@ const UpsertTransactionDialog = ({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Data</FormLabel>
-                    <DatePicker
-                      value={field.value ? new Date(field.value) : new Date()}
-                      onChange={field.onChange}
-                    />
+                    <DialogTrigger asChild>
+                      <DatePicker
+                        value={field.value ? new Date(field.value) : new Date()}
+                        onChange={field.onChange}
+                      />
+                    </DialogTrigger>
                     <FormMessage />
                   </FormItem>
                 )}
