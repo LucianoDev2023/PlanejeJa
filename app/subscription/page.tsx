@@ -54,7 +54,7 @@ const SubscriptionPage = async () => {
                     <span className="text-2xl font-semibold sm:text-3xl md:text-4xl">
                       0
                     </span>
-                    <div className="text-muted-foreground">/mês</div>
+                    <div className="text-muted-foreground">/ mês</div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6 py-8">
@@ -124,7 +124,7 @@ const SubscriptionPage = async () => {
                       </span>
                     </div>
 
-                    <div className="text-muted-foreground">/mês</div>
+                    <div className="text-muted-foreground">/ mês</div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6 py-8">
@@ -149,6 +149,15 @@ const SubscriptionPage = async () => {
               </Card>
             </div>
             <FaqPlano />
+            <div className="w-full border-t">
+              <p className="p-1 text-center text-xs text-gray-500">
+                {" "}
+                Para mais informações entre em contato com o suporte
+              </p>
+              <p className="text-center text-xs text-gray-500">
+                <b /> suporte@gmail.com
+              </p>
+            </div>
           </div>
         </div>
       </ScrollArea>
