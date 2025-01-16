@@ -82,6 +82,7 @@ export const getDashboardTotal = async (
   );
 
   const balance = depositsTotal + investmentsTotal - expensesTotal;
+  const balanceSun = depositsTotal + investmentsTotal + expensesTotal;
 
   const transactionsTotal = Number(
     (
@@ -127,6 +128,7 @@ export const getDashboardTotal = async (
     take: 8,
   });
   return {
+    balanceSun,
     balance,
     depositsTotal,
     investmentsTotal,
