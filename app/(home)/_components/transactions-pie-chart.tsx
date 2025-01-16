@@ -30,6 +30,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 interface TransactionsPieChartProps {
+  valorFormatado: string;
   typesPercentage: TransactionPercentagePerType;
   depositsTotal: number;
   investmentsTotal: number;
@@ -37,6 +38,7 @@ interface TransactionsPieChartProps {
 }
 
 const TransactionsPieChart = ({
+  valorFormatado,
   depositsTotal,
   investmentsTotal,
   expensesTotal,
@@ -63,26 +65,28 @@ const TransactionsPieChart = ({
     <Card className="m-0 flex items-center justify-center bg-gradient-to-b from-[#131d27] to-[#040b11] p-0 pt-2 sm:h-full sm:w-full">
       <CardContent className="m-0 mb-2 grid h-full grid-cols-[40%,60%] p-0 sm:mb-0 sm:grid-cols-2">
         {/* Div para o gráfico */}
-
-        <div
-          key="2"
-          className="m-0 flex h-full w-full flex-row items-center justify-center sm:flex-col sm:p-2"
-        >
-          <ChartContainer config={chartConfig} className="h-full w-full">
-            <PieChart className="h-full w-full">
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Pie
-                data={chartData}
-                dataKey="amount"
-                nameKey="type"
-                innerRadius="45%"
-                outerRadius="70%"
-              />
-            </PieChart>
-          </ChartContainer>
+        <div className="flex flex-col">
+          <p className="pt-4 text-center text-xs">Total = {valorFormatado}</p>
+          <div
+            key="2"
+            className="m-0 flex h-full w-full flex-row items-center justify-center sm:flex-col sm:p-2"
+          >
+            <ChartContainer config={chartConfig} className="h-full w-full">
+              <PieChart className="h-full w-full">
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Pie
+                  data={chartData}
+                  dataKey="amount"
+                  nameKey="type"
+                  innerRadius="45%"
+                  outerRadius="70%"
+                />
+              </PieChart>
+            </ChartContainer>
+          </div>
         </div>
 
         {/* Div para os PercentageItems */}
