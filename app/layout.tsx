@@ -37,10 +37,10 @@ export default function RootLayout({
           property="og:description"
           content="Com PlanejeJá, você tem as ferramentas certas para organizar suas finanças, controlar despesas, receitas e investimentos de forma simples e eficaz."
         />
-        <meta property="og:image" content="/bg.png" />
+        <meta property="og:image" content="/logmeta.jpg" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.planejeja.com.br" />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="logmeta.jpg" />
         <meta
           name="twitter:title"
           content="PlanejeJá - Controle Financeiro Fácil e Rápido"
@@ -49,7 +49,7 @@ export default function RootLayout({
           name="twitter:description"
           content="Gerencie suas finanças de maneira prática e objetiva com PlanejeJá. Acompanhe seu fluxo de caixa, investimentos e gastos de forma intuitiva."
         />
-        <meta name="twitter:image" content="/bg-png" />
+        <meta name="twitter:image" content="/logmeta.jpg" />
         <meta name="author" content="PlanejeJá Team" />
         <meta name="robots" content="index, follow" />
       </Head>
