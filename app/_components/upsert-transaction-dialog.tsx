@@ -57,14 +57,10 @@ const formSchema = z.object({
     message: "O nome é obrigatório.",
   }),
   amount: z.preprocess(
-    (val) => (val === "" ? null : val), // Converte a string vazia para null
+    (val) => (val === "" ? null : val),
     z
-      .number({
-        required_error: "O valor é obrigatório.",
-      })
-      .positive({
-        message: "Digite o valor da transação.",
-      }),
+      .number({ required_error: "O valor é obrigatório." })
+      .positive({ message: "Digite o valor da transação." }),
   ),
   type: z.nativeEnum(TransactionType, {
     required_error: "O tipo é obrigatório.",
@@ -100,6 +96,34 @@ const UpsertTransactionDialog = ({
       type: TransactionType.EXPENSE,
     },
   });
+
+  const [amount, setAmount] = useState("0,00");
+
+  // Função que formata o valor de acordo com a moeda brasileira
+  const handleAmountChange = (value: string) => {
+    // Remove qualquer caractere não numérico (exceto a vírgula)
+    const numericValue = value.replace(/\D/g, "");
+
+    // Se o valor for vazio, exibe "0,00"
+    if (numericValue === "") {
+      setAmount("0,00");
+      form.setValue("amount", 0);
+      return;
+    }
+
+    // Adiciona as casas decimais, sempre com 2 casas após a vírgula
+    let formattedValue = numericValue;
+    if (formattedValue.length > 2) {
+      formattedValue = `${formattedValue.slice(0, formattedValue.length - 2)},${formattedValue.slice(-2)}`;
+    } else {
+      formattedValue = `0,${formattedValue.padStart(2, "0")}`;
+    }
+
+    setAmount(formattedValue);
+
+    // Converte de volta para float para enviar ao formulário
+    form.setValue("amount", parseFloat(numericValue) / 100);
+  };
 
   const onSubmit = async (data: FormSchema) => {
     setLoading(true);
@@ -169,13 +193,9 @@ const UpsertTransactionDialog = ({
                     <FormControl>
                       <MoneyInput
                         placeholder="Digite o valor..."
-                        value={
-                          field.value
-                            ? field.value.toFixed(2).replace(".", ",")
-                            : "0,00"
-                        }
+                        value={amount}
                         onValueChange={({ floatValue }) =>
-                          field.onChange(floatValue)
+                          handleAmountChange(floatValue?.toString() || "0,00")
                         }
                         onBlur={field.onBlur}
                         disabled={field.disabled}

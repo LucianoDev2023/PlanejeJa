@@ -24,7 +24,7 @@ const SummaryCard = ({
   const toggleAmountVisibility = () => {
     setIsAmountVisible((prevState) => !prevState); // Alterna a visibilidade
   };
-  console.log(isAmountVisible);
+
   return (
     <>
       <Card className="m-0 flex-col items-center justify-center gap-3 bg-gradient-to-b from-[#131d27] to-[#040b11] p-0 sm:flex-row">
