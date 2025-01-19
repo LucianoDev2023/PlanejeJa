@@ -38,7 +38,6 @@ interface TransactionsPieChartProps {
 }
 
 const TransactionsPieChart = ({
-  valorFormatado,
   depositsTotal,
   investmentsTotal,
   expensesTotal,
@@ -66,17 +65,12 @@ const TransactionsPieChart = ({
       <CardContent className="m-0 mb-2 grid h-full grid-cols-[40%,60%] p-0 sm:mb-0 sm:grid-cols-2">
         {/* Div para o gráfico */}
         <div className="flex flex-col">
-          <p className="pt-4 text-center text-xs">Total = {valorFormatado}</p>
           <div
             key="2"
             className="m-0 flex h-full w-full flex-row items-center justify-center sm:flex-col sm:p-2"
           >
             <ChartContainer config={chartConfig} className="h-full w-full">
               <PieChart className="h-full w-full">
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
                 <Pie
                   data={chartData}
                   dataKey="amount"

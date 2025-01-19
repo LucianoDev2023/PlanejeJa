@@ -97,32 +97,35 @@ const UpsertTransactionDialog = ({
     },
   });
 
-  const [amount, setAmount] = useState("0,00");
+  const [amount, setAmount] = useState("R$ 0,00");
 
-  // Função que formata o valor de acordo com a moeda brasileira
-  const handleAmountChange = (value: string) => {
-    // Remove qualquer caractere não numérico (exceto a vírgula)
-    const numericValue = value.replace(/\D/g, "");
+  const formatarMoeda = (value: string) => {
+    let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
 
-    // Se o valor for vazio, exibe "0,00"
-    if (numericValue === "") {
-      setAmount("0,00");
-      form.setValue("amount", 0);
-      return;
+    valor = parseInt(valor).toString(); // Converte para inteiro e volta para string
+    valor = valor.replace(/([0-9]{2})$/g, ",$1"); // Adiciona a vírgula para separar os centavos
+
+    // Lógica de formatação conforme o tamanho do número
+    if (valor.length > 6 && valor.length <= 10) {
+      valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+    }
+    if (valor.length > 10 && valor.length <= 12) {
+      valor = valor.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, ".$1.$2,$3");
+    }
+    if (valor.length > 12 && valor.length <= 18) {
+      valor = valor.replace(
+        /([0-9]{3})\.([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g,
+        ".$1.$2.$3,$4",
+      );
     }
 
-    // Adiciona as casas decimais, sempre com 2 casas após a vírgula
-    let formattedValue = numericValue;
-    if (formattedValue.length > 2) {
-      formattedValue = `${formattedValue.slice(0, formattedValue.length - 2)},${formattedValue.slice(-2)}`;
-    } else {
-      formattedValue = `0,${formattedValue.padStart(2, "0")}`;
-    }
+    return `R$ ${valor}`;
+  };
 
-    setAmount(formattedValue);
-
-    // Converte de volta para float para enviar ao formulário
-    form.setValue("amount", parseFloat(numericValue) / 100);
+  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = event.target.value;
+    const formattedValue = formatarMoeda(rawValue);
+    setAmount(formattedValue); // Atualiza o estado com o valor formatado
   };
 
   const onSubmit = async (data: FormSchema) => {
@@ -137,10 +140,6 @@ const UpsertTransactionDialog = ({
 
       setIsOpen(false);
       form.reset();
-      // Verifica se a operação é de atualização, e se sim, recarrega a página
-      // if (transactionId) {
-      //   window.location.reload(); // Recarrega a página apenas para atualizações
-      // }
     } catch (error) {
       console.error(error);
     }
@@ -192,13 +191,10 @@ const UpsertTransactionDialog = ({
                     <FormLabel>Valor</FormLabel>
                     <FormControl>
                       <MoneyInput
-                        placeholder="Digite o valor..."
+                        type="text"
                         value={amount}
-                        onValueChange={({ floatValue }) =>
-                          handleAmountChange(floatValue?.toString() || "0,00")
-                        }
-                        onBlur={field.onBlur}
-                        disabled={field.disabled}
+                        onChange={handleAmountChange}
+                        onBlur={handleAmountChange} // Ao perder o foco também formata
                       />
                     </FormControl>
                     <FormMessage />
@@ -219,7 +215,7 @@ const UpsertTransactionDialog = ({
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a verified email to display" />
+                              <SelectValue placeholder="Selecione o tipo..." />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -307,12 +303,10 @@ const UpsertTransactionDialog = ({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Data</FormLabel>
-                    <DialogTrigger asChild>
-                      <DatePicker
-                        value={field.value ? new Date(field.value) : new Date()}
-                        onChange={field.onChange}
-                      />
-                    </DialogTrigger>
+                    <DatePicker
+                      value={field.value ? new Date(field.value) : new Date()}
+                      onChange={field.onChange}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -327,7 +321,7 @@ const UpsertTransactionDialog = ({
 
                   <Button type="submit" disabled={loading}>
                     {loading ? (
-                      <span className="loader text-xs">Carregando...</span> // Você pode customizar o ícone de carregamento aqui
+                      <span className="loader text-xs">Carregando...</span>
                     ) : isUpdate ? (
                       "Atualizar"
                     ) : (
