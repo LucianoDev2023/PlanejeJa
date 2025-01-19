@@ -57,14 +57,10 @@ const formSchema = z.object({
     message: "O nome é obrigatório.",
   }),
   amount: z.preprocess(
-    (val) => (val === "" ? null : val), // Converte a string vazia para null
+    (val) => (val === "" ? null : val),
     z
-      .number({
-        required_error: "O valor é obrigatório.",
-      })
-      .positive({
-        message: "Digite o valor da transação.",
-      }),
+      .number({ required_error: "O valor é obrigatório." })
+      .positive({ message: "Digite o valor da transação." }),
   ),
   type: z.nativeEnum(TransactionType, {
     required_error: "O tipo é obrigatório.",
@@ -101,6 +97,37 @@ const UpsertTransactionDialog = ({
     },
   });
 
+  const [amount, setAmount] = useState("R$ 0,00");
+
+  const formatarMoeda = (value: string) => {
+    let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
+
+    valor = parseInt(valor).toString(); // Converte para inteiro e volta para string
+    valor = valor.replace(/([0-9]{2})$/g, ",$1"); // Adiciona a vírgula para separar os centavos
+
+    // Lógica de formatação conforme o tamanho do número
+    if (valor.length > 6 && valor.length <= 10) {
+      valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+    }
+    if (valor.length > 10 && valor.length <= 12) {
+      valor = valor.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, ".$1.$2,$3");
+    }
+    if (valor.length > 12 && valor.length <= 18) {
+      valor = valor.replace(
+        /([0-9]{3})\.([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g,
+        ".$1.$2.$3,$4",
+      );
+    }
+
+    return `R$ ${valor}`;
+  };
+
+  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = event.target.value;
+    const formattedValue = formatarMoeda(rawValue);
+    setAmount(formattedValue); // Atualiza o estado com o valor formatado
+  };
+
   const onSubmit = async (data: FormSchema) => {
     setLoading(true);
 
@@ -113,10 +140,6 @@ const UpsertTransactionDialog = ({
 
       setIsOpen(false);
       form.reset();
-      // Verifica se a operação é de atualização, e se sim, recarrega a página
-      // if (transactionId) {
-      //   window.location.reload(); // Recarrega a página apenas para atualizações
-      // }
     } catch (error) {
       console.error(error);
     }
@@ -168,17 +191,10 @@ const UpsertTransactionDialog = ({
                     <FormLabel>Valor</FormLabel>
                     <FormControl>
                       <MoneyInput
-                        placeholder="Digite o valor..."
-                        value={
-                          field.value
-                            ? field.value.toFixed(2).replace(".", ",")
-                            : "0,00"
-                        }
-                        onValueChange={({ floatValue }) =>
-                          field.onChange(floatValue)
-                        }
-                        onBlur={field.onBlur}
-                        disabled={field.disabled}
+                        type="text"
+                        value={amount}
+                        onChange={handleAmountChange}
+                        onBlur={handleAmountChange} // Ao perder o foco também formata
                       />
                     </FormControl>
                     <FormMessage />
@@ -199,7 +215,7 @@ const UpsertTransactionDialog = ({
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a verified email to display" />
+                              <SelectValue placeholder="Selecione o tipo..." />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -287,12 +303,10 @@ const UpsertTransactionDialog = ({
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Data</FormLabel>
-                    <DialogTrigger asChild>
-                      <DatePicker
-                        value={field.value ? new Date(field.value) : new Date()}
-                        onChange={field.onChange}
-                      />
-                    </DialogTrigger>
+                    <DatePicker
+                      value={field.value ? new Date(field.value) : new Date()}
+                      onChange={field.onChange}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -307,7 +321,7 @@ const UpsertTransactionDialog = ({
 
                   <Button type="submit" disabled={loading}>
                     {loading ? (
-                      <span className="loader text-xs">Carregando...</span> // Você pode customizar o ícone de carregamento aqui
+                      <span className="loader text-xs">Carregando...</span>
                     ) : isUpdate ? (
                       "Atualizar"
                     ) : (

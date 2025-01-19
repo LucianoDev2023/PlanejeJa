@@ -13,6 +13,8 @@ import { getDashboardTotal } from "../_data/get-dashboard/index_total";
 import { getYearLimits } from "../_data/get-dashboard/limit_year";
 import AddTransactionButton from "../_components/add-transaction-button";
 import { Card } from "../_components/ui/card";
+import VisibilityToggle from "./_components/VisibilityToggle";
+import { useState } from "react";
 
 interface HomeProps {
   searchParams: {

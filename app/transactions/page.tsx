@@ -97,14 +97,14 @@ const TransactionsPage = async ({
       <div className="m-2 overflow-y-auto">
         {" "}
         {/* Aqui você aplica o scroll na página */}
-        <div className="m-2 flex h-full cursor-default flex-col gap-2 sm:flex-row">
-          <div className="flex h-full flex-1 flex-col items-center justify-center gap-2">
+        <div className="flex h-full cursor-default flex-col gap-2 sm:flex-row">
+          <div className="flex h-full flex-1 flex-col gap-2">
             <p className="text-center font-sans text-sm font-normal text-white/70 sm:text-lg">
               {assinado ? (
                 "Selecione o perído das transações que deseja exibir"
               ) : (
-                <span className="font-sans text-gray-500">
-                  <span className="font-sans text-xs text-gray-500">
+                <span className="font-sans font-normal text-gray-500">
+                  <span className="font-sans text-xs font-normal text-gray-500">
                     (Apenas para Plano Premium)
                     <br />
                   </span>
