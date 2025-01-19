@@ -57,7 +57,18 @@ const formSchema = z.object({
     message: "O nome é obrigatório.",
   }),
   amount: z.preprocess(
-    (val) => (val === "" ? null : val),
+    (val) => {
+      if (typeof val === "string") {
+        // Remove qualquer coisa que não seja número ou vírgula
+        const numericValue = val.replace(/[^\d,]/g, "").replace(",", ".");
+        console.log("valor de numericValue fora da if", numericValue);
+        console.log("tipo de numericValue fora do if", typeof numericValue);
+        return parseFloat(numericValue);
+      }
+      console.log("valor de val fora da if", val);
+      console.log("tipo de val fora do if", typeof val);
+      return val;
+    },
     z
       .number({ required_error: "O valor é obrigatório." })
       .positive({ message: "Digite o valor da transação." }),
@@ -97,7 +108,7 @@ const UpsertTransactionDialog = ({
     },
   });
 
-  const [amount, setAmount] = useState("R$ 0,00");
+  const [amount, setAmount] = useState<number>(0);
 
   const formatarMoeda = (value: string) => {
     let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
@@ -119,20 +130,29 @@ const UpsertTransactionDialog = ({
       );
     }
 
-    return `R$ ${valor}`;
+    return `${valor}`;
   };
+  console.log("teste de amount", amount);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = event.target.value;
-    const formattedValue = formatarMoeda(rawValue);
-    setAmount(formattedValue); // Atualiza o estado com o valor formatado
+    const numericValue = rawValue.replace(/[^\d,]/g, "").replace(",", ".");
+
+    // Converte para número
+    const numericAmount = parseFloat(numericValue);
+
+    if (!isNaN(numericAmount)) {
+      setAmount(numericAmount); // Atualiza o estado com o valor numérico
+    }
+
+    console.log("Valor numérico:", numericAmount);
   };
 
   const onSubmit = async (data: FormSchema) => {
     setLoading(true);
 
     try {
-      await upsertTransaction({ ...data, id: transactionId });
+      await upsertTransaction({ ...data, amount: amount, id: transactionId });
 
       setTimeout(() => {
         setLoading(false);
@@ -192,9 +212,15 @@ const UpsertTransactionDialog = ({
                     <FormControl>
                       <MoneyInput
                         type="text"
-                        value={amount}
-                        onChange={handleAmountChange}
-                        onBlur={handleAmountChange} // Ao perder o foco também formata
+                        value={formatarMoeda(field.value.toString())} // Formata apenas para exibição
+                        onChange={(e) => {
+                          field.onChange(e); // Atualiza o valor no formulário
+                          handleAmountChange(e); // Atualiza o valor no estado
+                        }}
+                        onBlur={(e) => {
+                          handleAmountChange(e); // Formata ao perder o foco
+                          field.onBlur(); // Chama o onBlur do react-hook-form
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
