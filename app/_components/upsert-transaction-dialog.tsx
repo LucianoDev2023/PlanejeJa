@@ -51,7 +51,6 @@ interface UpsertTransactionDialogProps {
   setIsOpen: (isOpen: boolean) => void;
   date?: Date;
 }
-
 const formSchema = z.object({
   name: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
@@ -61,18 +60,22 @@ const formSchema = z.object({
       if (typeof val === "string") {
         // Remove qualquer coisa que não seja número ou vírgula
         const numericValue = val.replace(/[^\d,]/g, "").replace(",", ".");
-        console.log("valor de numericValue fora da if", numericValue);
-        console.log("tipo de numericValue fora do if", typeof numericValue);
-        return parseFloat(numericValue);
+        const floatValue = parseFloat(numericValue);
+
+        // Verifica o número de casas decimais
+        const decimalPlaces = numericValue.split(".")[1]?.length || 0;
+
+        console.log(decimalPlaces);
+        return floatValue;
       }
-      console.log("valor de val fora da if", val);
-      console.log("tipo de val fora do if", typeof val);
+
       return val;
     },
     z
       .number({ required_error: "O valor é obrigatório." })
       .positive({ message: "Digite o valor da transação." }),
   ),
+
   type: z.nativeEnum(TransactionType, {
     required_error: "O tipo é obrigatório.",
   }),
@@ -110,49 +113,98 @@ const UpsertTransactionDialog = ({
 
   const [amount, setAmount] = useState<number>(0);
 
-  const formatarMoeda = (value: string) => {
-    let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
+  function contarCasasDecimais(valor: string) {
+    // Converte o valor para string e remove a parte inteira (antes da vírgula ou ponto)
+    const partes = valor.toString().split("."); // Separando pela vírgula (caso seja formato brasileiro)
+    if (!partes[1]) {
+      // Se a segunda parte (decimal) estiver vazia ou não existir, adiciona "00"
+      const novoValor = true;
+      return novoValor;
+    }
+    return false;
+  }
 
-    valor = parseInt(valor).toString(); // Converte para inteiro e volta para string
+  const formatarMoeda = (value: string) => {
+    console.log(
+      "estou dentro do formatar moeda 1:",
+      value,
+      "casas decimais",
+      contarCasasDecimais(value),
+    );
+
+    let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
+    console.log("estou dentro do formatar moeda 2: ", valor);
+
+    valor = parseFloat(valor).toString(); // Converte para inteiro e volta para string
+
+    console.log("conversão de valor para parseFloat :", valor);
+
     valor = valor.replace(/([0-9]{2})$/g, ",$1"); // Adiciona a vírgula para separar os centavos
+    console.log("estou dentro do formatar moeda após o replace 4:", valor);
 
     // Lógica de formatação conforme o tamanho do número
     if (valor.length > 6 && valor.length <= 10) {
       valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+      console.log("estou dentro do formatar moeda 5:", valor);
     }
     if (valor.length > 10 && valor.length <= 12) {
       valor = valor.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, ".$1.$2,$3");
+      console.log("estou dentro do formatar moeda 6:", valor);
     }
     if (valor.length > 12 && valor.length <= 18) {
       valor = valor.replace(
         /([0-9]{3})\.([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g,
         ".$1.$2.$3,$4",
       );
+      console.log(
+        "estou dentro do formatar moeda 7:",
+        valor,
+        ":",
+        typeof valor,
+      );
     }
+    console.log(
+      "valor do return:",
+      valor,
+      "casas decimais:",
+      contarCasasDecimais(valor),
+    );
 
     return `${valor}`;
   };
-  console.log("teste de amount", amount);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = event.target.value;
-    const numericValue = rawValue.replace(/[^\d,]/g, "").replace(",", ".");
-
+    let rawValue = event.target.value;
+    // Substitui qualquer coisa que não seja número ou vírgula
+    rawValue = rawValue.replace(/[^\d,]/g, "");
+    // Se houver vírgula, converte para ponto
+    const numericValue = rawValue.replace(",", ".");
     // Converte para número
-    const numericAmount = parseFloat(numericValue);
-
-    if (!isNaN(numericAmount)) {
-      setAmount(numericAmount); // Atualiza o estado com o valor numérico
+    let numericAmount = parseFloat(numericValue);
+    // Verifica se a conversão gerou um número válido
+    if (isNaN(numericAmount)) return;
+    // Garante que o número tenha sempre 2 casas decimais
+    if (numericAmount % 1 !== 0) {
+      // Verifica se há parte decimal
+      // Adiciona zero à direita se tiver apenas uma casa decimal
+      numericAmount = parseFloat(numericAmount.toFixed(2));
     }
-
-    console.log("Valor numérico:", numericAmount);
+    console.log("valor de numericAmounnt :", numericAmount);
+    setAmount(numericAmount); // Atualiza o valor numérico no estado
   };
 
   const onSubmit = async (data: FormSchema) => {
     setLoading(true);
 
     try {
-      await upsertTransaction({ ...data, amount: amount, id: transactionId });
+      // Garante que o valor do amount tenha duas casas decimais
+      // const formattedAmount = amount.toFixed(2);
+
+      await upsertTransaction({
+        ...data,
+        amount: amount,
+        id: transactionId,
+      });
 
       setTimeout(() => {
         setLoading(false);
