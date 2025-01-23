@@ -101,14 +101,14 @@ const TransactionsPage = async ({
           <div className="flex h-full flex-1 flex-col gap-2">
             <p className="text-center font-sans text-sm font-normal text-white/70 sm:text-lg">
               {assinado ? (
-                "Selecione o perído das transações que deseja exibir"
+                "Selecione o perído desejado"
               ) : (
                 <span className="font-sans font-normal text-gray-500">
                   <span className="font-sans text-xs font-normal text-gray-500">
                     (Apenas para Plano Premium)
                     <br />
                   </span>
-                  Selecione o perído das transações que deseja exibir{" "}
+                  Selecione o perído{" "}
                 </span>
               )}
             </p>

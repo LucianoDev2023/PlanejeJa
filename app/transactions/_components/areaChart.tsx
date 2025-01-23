@@ -54,13 +54,10 @@ export function TransactionChart({ chartDates, daysInMonth }: ChartProps) {
     }));
 
     return (
-      <Card className="w-full items-center justify-center">
+      <Card className="w-full items-center justify-center bg-gradient-to-b from-[#131d27] to-[#040b11]">
         <CardHeader className="flex w-full items-center gap-2 space-y-0 sm:flex-row"></CardHeader>
         <CardContent>
-          <ChartContainer
-            config={chartConfig}
-            className="w-full bg-gradient-to-b from-[#131d27] to-[#040b11]"
-          >
+          <ChartContainer config={chartConfig} className="w-full">
             <LineChart
               className="items-center justify-center"
               data={graphData}
