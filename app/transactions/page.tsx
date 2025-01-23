@@ -99,7 +99,7 @@ const TransactionsPage = async ({
         {/* Aqui você aplica o scroll na página */}
         <div className="flex h-full cursor-default flex-col gap-2 sm:flex-row">
           <div className="flex h-full flex-1 flex-col gap-2">
-            <p className="text-center font-sans text-sm font-normal text-white/70 sm:text-lg">
+            <p className="text-center font-sans font-normal">
               {assinado ? (
                 "Selecione o perído desejado"
               ) : (
