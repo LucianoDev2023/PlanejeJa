@@ -49,16 +49,20 @@ export const getDashboard = async (month: string) => {
     )._sum.amount,
   );
   const typesPercentage: TransactionPercentagePerType = {
-    [TransactionType.DEPOSIT]: Math.round(
-      (Number(depositsTotal || 0) / Number(transactionsTotal)) * 100,
-    ),
-    [TransactionType.EXPENSE]: Math.round(
-      (Number(expensesTotal || 0) / Number(transactionsTotal)) * 100,
-    ),
-    [TransactionType.INVESTMENT]: Math.round(
-      (Number(investmentsTotal || 0) / Number(transactionsTotal)) * 100,
-    ),
+    [TransactionType.DEPOSIT]:
+      Math.round(
+        (Number(depositsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+      ) / 10, // Arredonda para uma casa decimal
+    [TransactionType.EXPENSE]:
+      Math.round(
+        (Number(expensesTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+      ) / 10, // Arredonda para uma casa decimal
+    [TransactionType.INVESTMENT]:
+      Math.round(
+        (Number(investmentsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+      ) / 10, // Arredonda para uma casa decimal
   };
+
   const totalExpensePerCategory: TotalExpensePerCategory[] = (
     await db.transaction.groupBy({
       by: ["category"],

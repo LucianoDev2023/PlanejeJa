@@ -51,7 +51,6 @@ interface UpsertTransactionDialogProps {
   setIsOpen: (isOpen: boolean) => void;
   date?: Date;
 }
-
 const formSchema = z.object({
   name: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
@@ -61,18 +60,22 @@ const formSchema = z.object({
       if (typeof val === "string") {
         // Remove qualquer coisa que não seja número ou vírgula
         const numericValue = val.replace(/[^\d,]/g, "").replace(",", ".");
-        console.log("valor de numericValue fora da if", numericValue);
-        console.log("tipo de numericValue fora do if", typeof numericValue);
-        return parseFloat(numericValue);
+        const floatValue = parseFloat(numericValue);
+
+        // Verifica o número de casas decimais
+        const decimalPlaces = numericValue.split(".")[1]?.length || 0;
+
+        console.log(decimalPlaces);
+        return floatValue;
       }
-      console.log("valor de val fora da if", val);
-      console.log("tipo de val fora do if", typeof val);
+
       return val;
     },
     z
       .number({ required_error: "O valor é obrigatório." })
       .positive({ message: "Digite o valor da transação." }),
   ),
+
   type: z.nativeEnum(TransactionType, {
     required_error: "O tipo é obrigatório.",
   }),
@@ -96,6 +99,7 @@ const UpsertTransactionDialog = ({
   setIsOpen,
   date,
 }: UpsertTransactionDialogProps) => {
+  console.log("VALOR DE AMMOUNT:", defaultValues);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
@@ -112,8 +116,7 @@ const UpsertTransactionDialog = ({
 
   const formatarMoeda = (value: string) => {
     let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
-
-    valor = parseInt(valor).toString(); // Converte para inteiro e volta para string
+    valor = parseFloat(valor).toString(); // Converte para inteiro e volta para string
     valor = valor.replace(/([0-9]{2})$/g, ",$1"); // Adiciona a vírgula para separar os centavos
 
     // Lógica de formatação conforme o tamanho do número
@@ -129,30 +132,40 @@ const UpsertTransactionDialog = ({
         ".$1.$2.$3,$4",
       );
     }
-
     return `${valor}`;
   };
-  console.log("teste de amount", amount);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = event.target.value;
-    const numericValue = rawValue.replace(/[^\d,]/g, "").replace(",", ".");
-
+    let rawValue = event.target.value;
+    // Substitui qualquer coisa que não seja número ou vírgula
+    rawValue = rawValue.replace(/[^\d,]/g, "");
+    // Se houver vírgula, converte para ponto
+    const numericValue = rawValue.replace(",", ".");
     // Converte para número
-    const numericAmount = parseFloat(numericValue);
-
-    if (!isNaN(numericAmount)) {
-      setAmount(numericAmount); // Atualiza o estado com o valor numérico
+    let numericAmount = parseFloat(numericValue);
+    // Verifica se a conversão gerou um número válido
+    if (isNaN(numericAmount)) return;
+    // Garante que o número tenha sempre 2 casas decimais
+    if (numericAmount % 1 !== 0) {
+      // Verifica se há parte decimal
+      // Adiciona zero à direita se tiver apenas uma casa decimal
+      numericAmount = parseFloat(numericAmount.toFixed(2));
     }
-
-    console.log("Valor numérico:", numericAmount);
+    setAmount(numericAmount); // Atualiza o valor numérico no estado
   };
 
   const onSubmit = async (data: FormSchema) => {
     setLoading(true);
 
     try {
-      await upsertTransaction({ ...data, amount: amount, id: transactionId });
+      // Garante que o valor do amount tenha duas casas decimais
+      const formattedAmount = amount.toFixed(2);
+
+      await upsertTransaction({
+        ...data,
+        amount: parseFloat(formattedAmount),
+        id: transactionId,
+      });
 
       setTimeout(() => {
         setLoading(false);
@@ -192,19 +205,6 @@ const UpsertTransactionDialog = ({
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
               <FormField
                 control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o nome..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
@@ -227,6 +227,20 @@ const UpsertTransactionDialog = ({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Digite o nome..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="flex w-full gap-4">
                 <div className="flex-1">
                   <FormField
