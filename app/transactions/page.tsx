@@ -94,37 +94,41 @@ const TransactionsPage = async ({
   return (
     <>
       <Navbar />
-      <div className="m-2 overflow-y-auto">
+      <div className="m-2 overflow-y-auto p-2">
         {" "}
         {/* Aqui você aplica o scroll na página */}
         <div className="flex h-full cursor-default flex-col gap-2 sm:flex-row">
           <div className="flex h-full flex-1 flex-col gap-2">
-            <p className="text-center font-sans font-normal">
-              {assinado ? (
-                "Selecione o perído desejado"
-              ) : (
-                <span className="font-sans font-normal text-gray-500">
-                  <span className="font-sans text-xs font-normal text-gray-500">
-                    (Apenas para Plano Premium)
-                    <br />
+            <div className="flex w-full flex-col items-center justify-center gap-2 sm:flex-row">
+              <p className="flex items-center justify-center px-4 text-center font-sans font-normal">
+                {assinado ? (
+                  "Selecione o perído desejado"
+                ) : (
+                  <span className="font-sans font-normal text-gray-500">
+                    <span className="font-sans text-xs font-normal text-gray-500">
+                      (Apenas para Plano Premium)
+                      <br />
+                    </span>
+                    Selecione o perído{" "}
                   </span>
-                  Selecione o perído{" "}
-                </span>
-              )}
-            </p>
-            {/* TÍTULO E BOTÃO */}
-            <div className="flex w-full items-center justify-center gap-2">
-              <TimeSelectTransactions
-                assinatura={user.publicMetadata.subscriptionPlan === "premium"}
-              />
-              <div className="inline-block rounded-lg border">
-                <p className="flex w-fit items-center justify-center p-2 text-xs">
-                  {userItemCountMes > 1
-                    ? `${userItemCountMes} lançamentos`
-                    : `${userItemCountMes} lançamento`}
-                </p>
+                )}
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <TimeSelectTransactions
+                  assinatura={
+                    user.publicMetadata.subscriptionPlan === "premium"
+                  }
+                />
+                <div className="inline-block rounded-lg border">
+                  <p className="flex w-fit items-center justify-center p-2 text-xs">
+                    {userItemCountMes > 1
+                      ? `${userItemCountMes} lançamentos`
+                      : `${userItemCountMes} lançamento`}
+                  </p>
+                </div>
               </div>
             </div>
+            {/* TÍTULO E BOTÃO */}
 
             <TransactionChart
               chartDates={chartDate}
@@ -132,7 +136,7 @@ const TransactionsPage = async ({
             />
           </div>
           <div className="flex flex-1 flex-col">
-            <p className="mt-2 pb-2 font-sans font-normal sm:m-0 sm:pl-2">
+            <p className="mb-1 p-1 pr-2 font-sans font-normal sm:m-0 sm:p-2 sm:pl-2">
               Transações mensal
             </p>
 
