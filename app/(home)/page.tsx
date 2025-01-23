@@ -133,7 +133,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
             <p className="mt-2 pb-2 font-sans font-normal sm:m-0 sm:pl-2">
               Últimas Transações
             </p>
-            <div className="rouded-lg flex-1 items-center justify-center bg-gradient-to-b from-[#131d27] to-[#040b11]">
+            <div className="rouded-lg flex-1 items-center justify-between rounded-lg bg-gradient-to-b from-[#131d27] to-[#040b11]">
               <LastTransactions lastTransactions={dashboard.lastTransactions} />
             </div>
           </div>
