@@ -93,19 +93,51 @@ export const getDashboardTotal = async (
     )._sum.amount,
   );
 
+  // const typesPercentage: TransactionPercentagePerType = {
+  //   [TransactionType.DEPOSIT]:
+  //     Math.round(
+  //       (Number(depositsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+  //     ) / 10, // Arredonda para uma casa decimal
+  //   [TransactionType.EXPENSE]:
+  //     Math.round(
+  //       (Number(expensesTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+  //     ) / 10, // Arredonda para uma casa decimal
+
+  //   [TransactionType.INVESTMENT]:
+  //     Math.round(
+  //       (Number(investmentsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+  //     ) / 10, // Arredonda para uma casa decimal
+  // };
+
+  const depositPercentage =
+    Math.round(
+      (Number(depositsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+    ) / 10; // Arredonda para uma casa decimal
+
+  const expensePercentage =
+    Math.round(
+      (Number(expensesTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+    ) / 10; // Arredonda para uma casa decimal
+
+  // Calcule a porcentagem de investimentos de forma normal
+  let investmentPercentage =
+    Math.round(
+      (Number(investmentsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
+    ) / 10; // Arredonda para uma casa decimal
+
+  // Calcule a soma das porcentagens de depósitos e despesas
+  const totalPercentage = depositPercentage + expensePercentage;
+
+  // Ajuste a porcentagem de investimentos para garantir que a soma seja 100%
+  investmentPercentage += 100 - totalPercentage - investmentPercentage;
+
+  // Limitar a apresentação de investmentPercentage para 1 casa decimal, mantendo o tipo numérico
+  investmentPercentage = Math.round(investmentPercentage * 10) / 10; // Isso arredonda para 1 casa decimal como número
+
   const typesPercentage: TransactionPercentagePerType = {
-    [TransactionType.DEPOSIT]:
-      Math.round(
-        (Number(depositsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
-      ) / 10, // Arredonda para uma casa decimal
-    [TransactionType.EXPENSE]:
-      Math.round(
-        (Number(expensesTotal || 0) / Number(transactionsTotal)) * 100 * 10,
-      ) / 10, // Arredonda para uma casa decimal
-    [TransactionType.INVESTMENT]:
-      Math.round(
-        (Number(investmentsTotal || 0) / Number(transactionsTotal)) * 100 * 10,
-      ) / 10, // Arredonda para uma casa decimal
+    [TransactionType.DEPOSIT]: depositPercentage,
+    [TransactionType.EXPENSE]: expensePercentage,
+    [TransactionType.INVESTMENT]: investmentPercentage, // Agora é um número
   };
 
   const totalExpensePerCategory: TotalExpensePerCategory[] = (
