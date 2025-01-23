@@ -52,9 +52,6 @@ interface UpsertTransactionDialogProps {
   date?: Date;
 }
 const formSchema = z.object({
-  name: z.string().trim().min(1, {
-    message: "O nome é obrigatório.",
-  }),
   amount: z.preprocess(
     (val) => {
       if (typeof val === "string") {
@@ -75,6 +72,15 @@ const formSchema = z.object({
       .number({ required_error: "O valor é obrigatório." })
       .positive({ message: "Digite o valor da transação." }),
   ),
+  name: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "O nome é obrigatório.",
+    })
+    .max(25, {
+      message: "O nome não pode ter mais de 25 caracteres.",
+    }),
 
   type: z.nativeEnum(TransactionType, {
     required_error: "O tipo é obrigatório.",
@@ -234,7 +240,11 @@ const UpsertTransactionDialog = ({
                   <FormItem>
                     <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="Digite o nome..." {...field} />
+                    <Input
+          placeholder="Digite o nome..."
+          maxLength={25}  // Limita o número de caracteres para 25
+          {...field}
+        />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
