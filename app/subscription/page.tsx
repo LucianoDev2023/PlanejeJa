@@ -40,7 +40,7 @@ const SubscriptionPage = async () => {
                   <div>
                     {!hasPremiumPlan && (
                       // <Badge className="absolute right-16 top-11 bg-primary/10 text-primary">
-                      <Badge className="bg-primary/10 text-sm text-primary">
+                      <Badge className="bg-primary/90 text-sm text-white">
                         Ativo
                       </Badge>
                     )}
@@ -104,7 +104,7 @@ const SubscriptionPage = async () => {
                   <div className="flex gap-5">
                     {hasPremiumPlan && (
                       // <Badge className="absolute right-16 top-11 bg-primary/10 text-primary">
-                      <Badge className="bg-primary/20 text-sm text-primary">
+                      <Badge className="bg-primary/90 text-sm text-white">
                         Ativo
                       </Badge>
                     )}
@@ -155,7 +155,7 @@ const SubscriptionPage = async () => {
                 Para mais informações entre em contato com o suporte
               </p>
               <p className="text-center text-xs text-gray-500">
-                <b /> suporte@gmail.com
+                <b /> planejejasuporte@gmail.com
               </p>
             </div>
           </div>

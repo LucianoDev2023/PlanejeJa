@@ -99,6 +99,7 @@ const UpsertTransactionDialog = ({
   setIsOpen,
   date,
 }: UpsertTransactionDialogProps) => {
+  console.log("VALOR DE AMMOUNT:", defaultValues);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues ?? {
@@ -113,63 +114,24 @@ const UpsertTransactionDialog = ({
 
   const [amount, setAmount] = useState<number>(0);
 
-  function contarCasasDecimais(valor: string) {
-    // Converte o valor para string e remove a parte inteira (antes da vírgula ou ponto)
-    const partes = valor.toString().split("."); // Separando pela vírgula (caso seja formato brasileiro)
-    if (!partes[1]) {
-      // Se a segunda parte (decimal) estiver vazia ou não existir, adiciona "00"
-      const novoValor = true;
-      return novoValor;
-    }
-    return false;
-  }
-
   const formatarMoeda = (value: string) => {
-    console.log(
-      "estou dentro do formatar moeda 1:",
-      value,
-      "casas decimais",
-      contarCasasDecimais(value),
-    );
-
     let valor = value.replace(/[\D]+/g, ""); // Remove tudo que não for número
-    console.log("estou dentro do formatar moeda 2: ", valor);
-
     valor = parseFloat(valor).toString(); // Converte para inteiro e volta para string
-
-    console.log("conversão de valor para parseFloat :", valor);
-
     valor = valor.replace(/([0-9]{2})$/g, ",$1"); // Adiciona a vírgula para separar os centavos
-    console.log("estou dentro do formatar moeda após o replace 4:", valor);
 
     // Lógica de formatação conforme o tamanho do número
     if (valor.length > 6 && valor.length <= 10) {
       valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
-      console.log("estou dentro do formatar moeda 5:", valor);
     }
     if (valor.length > 10 && valor.length <= 12) {
       valor = valor.replace(/([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g, ".$1.$2,$3");
-      console.log("estou dentro do formatar moeda 6:", valor);
     }
     if (valor.length > 12 && valor.length <= 18) {
       valor = valor.replace(
         /([0-9]{3})\.([0-9]{3})\.([0-9]{3}),([0-9]{2}$)/g,
         ".$1.$2.$3,$4",
       );
-      console.log(
-        "estou dentro do formatar moeda 7:",
-        valor,
-        ":",
-        typeof valor,
-      );
     }
-    console.log(
-      "valor do return:",
-      valor,
-      "casas decimais:",
-      contarCasasDecimais(valor),
-    );
-
     return `${valor}`;
   };
 
@@ -189,7 +151,6 @@ const UpsertTransactionDialog = ({
       // Adiciona zero à direita se tiver apenas uma casa decimal
       numericAmount = parseFloat(numericAmount.toFixed(2));
     }
-    console.log("valor de numericAmounnt :", numericAmount);
     setAmount(numericAmount); // Atualiza o valor numérico no estado
   };
 
@@ -198,11 +159,11 @@ const UpsertTransactionDialog = ({
 
     try {
       // Garante que o valor do amount tenha duas casas decimais
-      // const formattedAmount = amount.toFixed(2);
+      const formattedAmount = amount.toFixed(2);
 
       await upsertTransaction({
         ...data,
-        amount: amount,
+        amount: parseFloat(formattedAmount),
         id: transactionId,
       });
 
@@ -244,19 +205,6 @@ const UpsertTransactionDialog = ({
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
               <FormField
                 control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o nome..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
@@ -279,6 +227,20 @@ const UpsertTransactionDialog = ({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Digite o nome..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="flex w-full gap-4">
                 <div className="flex-1">
                   <FormField
