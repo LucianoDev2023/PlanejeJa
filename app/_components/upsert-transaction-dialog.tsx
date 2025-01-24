@@ -240,11 +240,11 @@ const UpsertTransactionDialog = ({
                   <FormItem>
                     <FormLabel>Nome</FormLabel>
                     <FormControl>
-                    <Input
-          placeholder="Digite o nome..."
-          maxLength={25}  // Limita o número de caracteres para 25
-          {...field}
-        />
+                      <Input
+                        placeholder="Digite o nome..."
+                        maxLength={25} // Limita o número de caracteres para 25
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -303,7 +303,7 @@ const UpsertTransactionDialog = ({
                           <SelectContent>
                             {getTransactionCategoryOptions(
                               form.watch("type"),
-                            ).map((option) => (
+                            ).map((option, index) => (
                               <SelectItem
                                 key={option.value}
                                 value={option.value}
