@@ -139,12 +139,12 @@ export const getTransactionCategoryOptions = (type: TransactionType) => {
         label: "Outros",
       },
       {
-        value: TransactionCategory.SALARY,
-        label: "Salário",
-      },
-      {
         value: TransactionCategory.INTEREST,
         label: "Rendimentos",
+      },
+      {
+        value: TransactionCategory.SALARY,
+        label: "Salário",
       },
     ];
   }
@@ -152,6 +152,10 @@ export const getTransactionCategoryOptions = (type: TransactionType) => {
   // Se o tipo de transação for 'EXPENSE' (Despesa), retornar categorias comuns
   if (type === TransactionType.EXPENSE) {
     return [
+      {
+        value: TransactionCategory.FOOD,
+        label: "Alimentação",
+      },
       {
         value: TransactionCategory.EDUCATION,
         label: "Educação",
@@ -161,16 +165,16 @@ export const getTransactionCategoryOptions = (type: TransactionType) => {
         label: "Entretenimento",
       },
       {
-        value: TransactionCategory.FOOD,
-        label: "Alimentação",
+        value: TransactionCategory.HOUSING,
+        label: "Moradia",
+      },
+      {
+        value: TransactionCategory.OTHER,
+        label: "Outros",
       },
       {
         value: TransactionCategory.HEALTH,
         label: "Saúde",
-      },
-      {
-        value: TransactionCategory.HOUSING,
-        label: "Moradia",
       },
       {
         value: TransactionCategory.TRANSPORTATION,
