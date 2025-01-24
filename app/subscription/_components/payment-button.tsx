@@ -59,10 +59,7 @@ export default function PaymentButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="rouded-lg w-full border-2 border-white/10 bg-[#203241] font-bold"
-        >
+        <Button className="rouded-lg w-full border-2 border-white/10 bg-[#203241] font-bold">
           <Link
             href={`${process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL as string}?prefilled_email=${user.emailAddresses[0].emailAddress}`}
           >
