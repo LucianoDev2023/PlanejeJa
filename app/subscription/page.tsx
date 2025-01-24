@@ -8,6 +8,7 @@ import { getCurrentMonthTransactions } from "../_data/get-current-month-transact
 import { ScrollArea } from "../_components/ui/scroll-area";
 import PaymentButton from "./_components/payment-button";
 import { FaqPlano } from "./_components/faq";
+import ContactForm from "./_components/ContactForm";
 
 const SubscriptionPage = async () => {
   const { userId } = await auth();
@@ -15,6 +16,8 @@ const SubscriptionPage = async () => {
     redirect("/login");
   }
   const user = await clerkClient().users.getUser(userId);
+  const email = user.emailAddresses[0].emailAddress;
+  const firstName = user.firstName;
   const currentMonthTransactions = await getCurrentMonthTransactions();
   const hasPremiumPlan = user.publicMetadata.subscriptionPlan == "premium";
 
@@ -149,14 +152,14 @@ const SubscriptionPage = async () => {
               </Card>
             </div>
             <FaqPlano />
-            <div className="w-full border-t">
-              <p className="p-1 text-center text-xs text-gray-500">
+            <div className="w-full border-t border-gray-700">
+              <p className="p-1 pt-5 text-center text-xs text-gray-300">
                 {" "}
                 Para mais informações entre em contato com o suporte
               </p>
-              <p className="text-center text-xs text-gray-500">
-                <b /> planejejasuporte@gmail.com
-              </p>
+            </div>
+            <div className="w-full flex-col items-center justify-center px-6 sm:w-1/3">
+              <ContactForm email={email} firstName={firstName} />
             </div>
           </div>
         </div>
