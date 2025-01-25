@@ -23,11 +23,18 @@ const ContactForm: React.FC<ContactFormProps> = ({ email, firstName }) => {
     }
 
     const templateParams = {
+      email,
       firstName,
       message,
     };
 
     try {
+      const templateParams = {
+        email,
+        firstName,
+        message,
+      };
+
       const response = await emailjs.send(
         "planejejasuporte", // Serviço configurado no EmailJS
         "template_mic6tdd", // Template configurado no EmailJS
