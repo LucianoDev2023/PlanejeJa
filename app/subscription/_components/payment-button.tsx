@@ -26,11 +26,16 @@ export default function PaymentButton() {
     return fetch("/api/webhooks/stripe", {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
     })
       .then((res) => res.json())
-      .then((data) => data.client_secret);
+      .then((data) => {
+        if (!data.client_secret) {
+          throw new Error("Client secret não retornado pela API");
+        }
+        return data.client_secret;
+      });
   }, []);
 
   const options = { fetchClientSecret };
@@ -48,8 +53,7 @@ export default function PaymentButton() {
         <DialogContent className="max-h-[700px] w-full overflow-y-auto p-4">
           <div className="w-full">
             <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-              clear
-              <EmbeddedCheckout />
+              <EmbeddedCheckout className="max-h-[80dvh]" />
             </EmbeddedCheckoutProvider>
           </div>
         </DialogContent>
@@ -58,15 +62,14 @@ export default function PaymentButton() {
   }
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button className="rouded-lg w-full border-2 border-white/10 bg-[#203241] font-bold">
-          <Link
-            href={`${process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL as string}?prefilled_email=${user.emailAddresses[0].emailAddress}`}
-          >
-            Gerenciar plano
-          </Link>
-        </Button>
-      </DialogTrigger>
+      <Button className="rouded-lg w-full border-2 border-white/10 bg-[#203241] font-bold">
+        <Link
+          target="_blank"
+          href={`${process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL as string}?prefilled_email=${user.emailAddresses[0].emailAddress}`}
+        >
+          Gerenciar plano
+        </Link>
+      </Button>
       <DialogContent></DialogContent>
     </Dialog>
   );
