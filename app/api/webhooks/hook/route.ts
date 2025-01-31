@@ -60,6 +60,30 @@ export const POST = async (request: Request) => {
         },
       });
     }
+
+    case "customer.subscription.updated": {
+      // Identificar solicitação de cancelamento
+      const subscription = event.data.object as Stripe.Subscription;
+      if (subscription.status === "canceled") {
+        const clerkUserId = subscription.metadata.clerk_user_id;
+        const expirationDate = new Date(subscription.current_period_end * 1000); // Convertendo timestamp para Date
+
+        if (!clerkUserId) {
+          return NextResponse.error();
+        }
+
+        await clerkClient.users.updateUser(clerkUserId, {
+          privateMetadata: {
+            stripeSubscriptionId: subscription.id,
+            subscriptionExpiration: expirationDate.toISOString(), // Salvando a data de expiração
+          },
+          publicMetadata: {
+            subscriptionPlanStatus: "canceled",
+          },
+        });
+      }
+      break;
+    }
   }
   return NextResponse.json({ received: true });
 };
