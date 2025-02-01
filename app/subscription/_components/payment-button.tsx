@@ -23,7 +23,7 @@ export default function PaymentButton() {
   );
 
   const fetchClientSecret = useCallback(() => {
-    return fetch("/webapi/api/webhooks/hook", {
+    return fetch("/webapi/api/webhooks/stripe", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
