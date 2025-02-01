@@ -22,6 +22,7 @@ export const POST = async (request: Request) => {
 
   switch (event.type) {
     case "invoice.paid": {
+      console.log("invoice.paid");
       // Atualizar o usuário com o seu novo plano
       const { customer, subscription, subscription_details } =
         event.data.object;
@@ -42,6 +43,7 @@ export const POST = async (request: Request) => {
     }
 
     case "customer.subscription.deleted": {
+      console.log("customer.subscription.deleted");
       // Remover plano premium do usuário
       const subscription = await stripe.subscriptions.retrieve(
         event.data.object.id,
@@ -62,9 +64,11 @@ export const POST = async (request: Request) => {
     }
 
     case "customer.subscription.updated": {
+      console.log("customer.subscription.updated");
       // Identificar solicitação de cancelamento
       const subscription = event.data.object as Stripe.Subscription;
       if (subscription.status === "canceled") {
+        console.log("canceled");
         const clerkUserId = subscription.metadata.clerk_user_id;
         const expirationDate = new Date(subscription.current_period_end * 1000); // Convertendo timestamp para Date
 
