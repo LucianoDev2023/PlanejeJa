@@ -5,18 +5,33 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 export async function POST(request: Request) {
+  console.log(
+    "[Webhook] Recebendo requisição POST para criar sessão do Stripe",
+  );
+
   const { userId } = await auth();
   if (!userId) {
-    throw new Error("Unauthorized");
+    console.error("[Erro] Usuário não autenticado");
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
   if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("Stripe secret key not found");
+    console.error("[Erro] Chave secreta do Stripe não encontrada");
+    return NextResponse.json(
+      { message: "Stripe secret key not found" },
+      { status: 500 },
+    );
   }
+
+  console.log("[Info] Autenticação bem-sucedida para userId:", userId);
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
     apiVersion: "2024-11-20.acacia", // Sempre especifique a versão do Stripe
   });
 
   try {
+    console.log("[Info] Criando sessão do Stripe para userId:", userId);
+
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded",
       line_items: [
@@ -35,12 +50,14 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log("[Sucesso] Sessão do Stripe criada com ID:", session.id);
+
     return NextResponse.json({
       id: session.id,
       client_secret: session.client_secret,
     });
   } catch (e) {
-    console.error("Stripe error:", e);
+    console.error("[Erro] Falha ao criar sessão do Stripe:", e);
     return NextResponse.json(
       {
         message: "Error creating Stripe session",
