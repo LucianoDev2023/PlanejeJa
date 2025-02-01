@@ -23,7 +23,7 @@ export default function PaymentButton() {
   );
 
   const fetchClientSecret = useCallback(() => {
-    return fetch("/api/webhooks/stripe", {
+    return fetch("https://planejeja.com.br/webapi/api/webhooks/stripe", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
