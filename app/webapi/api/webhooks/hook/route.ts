@@ -89,5 +89,8 @@ export const POST = async (request: Request) => {
       break;
     }
   }
-  return NextResponse.json({ received: true });
+  return NextResponse.json({
+    message: "Plano cancelado com sucesso!",
+    received: true,
+  });
 };
