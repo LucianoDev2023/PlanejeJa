@@ -1,7 +1,6 @@
 // pages/api/olamundo.ts
+import { NextResponse } from "next/server";
 
-import { NextApiRequest, NextApiResponse } from "next";
-
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.status(200).json({ message: "Olá API" });
+export async function GET() {
+  return NextResponse.json({ message: "Olá API" });
 }
