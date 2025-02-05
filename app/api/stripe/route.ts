@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   console.log("[Info] Autenticação bem-sucedida para userId:", userId);
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-    apiVersion: "2024-11-20.acacia", // Sempre especifique a versão do Stripe
+    apiVersion: "2025-01-27.acacia", // Sempre especifique a versão do Stripe
   });
 
   try {
