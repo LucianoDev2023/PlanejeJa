@@ -40,7 +40,7 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      return_url: "https://planejeja.com.br/",
+      return_url: "http://localhost:3000/",
       mode: "subscription",
       payment_method_types: ["card"],
       subscription_data: {
