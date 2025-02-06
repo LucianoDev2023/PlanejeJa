@@ -77,12 +77,8 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
             />
             <AiReportButton
               month={month}
-              hasPremiumPlan={
-                user.publicMetadata.subscriptionPlan === "premium"
-              }
-              hasCanceledPlan={
-                user?.publicMetadata.subscriptionPlanStatus == "canceled"
-              }
+              hasPremiumPlan={user?.publicMetadata?.subscriptionPlan === "premium"}
+  hasCanceledPlan={user?.publicMetadata?.subscriptionPlanStatus === "canceled"}
             />
             {/* <TimeSelect /> */}
           </div>
