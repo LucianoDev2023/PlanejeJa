@@ -9,6 +9,7 @@ async function verificarAssinaturasExpiradas() {
     for (const user of users) {
       // Garantindo que expirationRaw seja uma string válida ou defina a data padrão
       let expirationRaw: unknown = user.publicMetadata?.subscriptionExpiration;
+      console.log(expirationRaw);
 
       // Se expirationRaw não for uma string válida, defina a data padrão
       if (typeof expirationRaw !== "string" || !expirationRaw.trim()) {
@@ -18,7 +19,7 @@ async function verificarAssinaturasExpiradas() {
       // Afirmação de tipo para garantir que expirationRaw é uma string válida
       const expirationDate = new Date(expirationRaw as string);
       const expirationPlusOne = new Date(expirationDate);
-      expirationPlusOne.setDate(expirationDate.getDate() + 1);
+      expirationPlusOne.setDate(expirationDate.getDate());
 
       if (hoje >= expirationPlusOne) {
         await clerkClient.users.updateUser(user.id, {
@@ -27,7 +28,7 @@ async function verificarAssinaturasExpiradas() {
           },
         });
         console.log(
-          `Assinatura do usuário ${user.id} foi marcada como encerrada.`
+          `Assinatura do usuário ${user.id} foi marcada como encerrada.`,
         );
       }
     }
@@ -37,6 +38,6 @@ async function verificarAssinaturasExpiradas() {
 }
 
 // Agendar a execução todos os dias à meia-noite
-cron.schedule("0 0 * * *", verificarAssinaturasExpiradas);
+cron.schedule("20 17 * * *", verificarAssinaturasExpiradas);
 
 console.log("✅ Agendamento de verificação de assinaturas iniciado.");
