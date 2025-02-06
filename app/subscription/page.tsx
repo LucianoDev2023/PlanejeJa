@@ -19,24 +19,8 @@ const SubscriptionPage = async () => {
   const email = user.emailAddresses[0].emailAddress;
   const firstName = user.firstName;
   const currentMonthTransactions = await getCurrentMonthTransactions();
-  const hasPremiumPlan: boolean =
-    user.publicMetadata.subscriptionPlan == "premium";
-  const expiration: unknown = user?.publicMetadata.expiration;
-  // Verificar se expiration é uma string antes de usá-la
-  const expirationString = expiration as string;
-
-  const compareDates = (expiration: string): boolean => {
-    // Converte o formato PT-BR (dd/mm/yyyy) para yyyy-mm-dd
-    const [day, month, year] = expiration.split("/");
-    const formattedDate = `${year}-${month}-${day}`; // Formato aceito por JavaScript
-
-    // Cria um objeto Date a partir da data formatada
-    const expirationDate = new Date(formattedDate);
-
-    // Compara com a data atual (new Date() é a data de hoje)
-    return expirationDate < new Date(); // Retorna true se expirationDate for menor que a data atual
-  };
-  const isExpired = compareDates(expirationString);
+  const hasPremiumPlan = user.publicMetadata.subscriptionPlan == "premium";
+  const expiration = user?.publicMetadata.expiration != "";
 
   return (
     <div className="h-full cursor-default bg-gradient-to-b from-[#2b4960] to-[#040b11] caret-transparent">
@@ -101,7 +85,7 @@ const SubscriptionPage = async () => {
                       </p>
                     </div>
                   )}
-                  {hasPremiumPlan && (
+                  {(hasPremiumPlan || expiration) && (
                     <div className="flex items-center gap-2">
                       <CheckIcon className="text-primary" size={20} />
                       <p className="text-sm">Limite de 10 transações por mês</p>
@@ -122,7 +106,8 @@ const SubscriptionPage = async () => {
               <Card className="flex w-[300px] flex-col rounded-lg border-2 shadow-[2px_2px_10px_rgba(255,255,255,0.8)] sm:w-[400px]">
                 <CardHeader className="relative border-b border-solid py-4">
                   <div className="flex gap-5">
-                    {(hasPremiumPlan || isExpired) && (
+                    {hasPremiumPlan && (
+                      // <Badge className="absolute right-16 top-11 bg-primary/10 text-primary">
                       <Badge className="bg-primary/90 text-sm text-white">
                         Ativo
                       </Badge>
