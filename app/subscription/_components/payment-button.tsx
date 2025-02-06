@@ -41,8 +41,10 @@ export default function PaymentButton() {
   const options = { fetchClientSecret };
   const { user } = useUser();
   const hasPremiumPlan = user?.publicMetadata.subscriptionPlan == "premium";
+  const hasCanceledPlan =
+    user?.publicMetadata.subscriptionPlanStatus == "canceled";
 
-  if (!hasPremiumPlan) {
+  if (!hasPremiumPlan && !hasCanceledPlan) {
     return (
       <Dialog>
         <DialogTrigger asChild>
