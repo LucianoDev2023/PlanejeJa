@@ -11,6 +11,7 @@ import DialogoSeletor from "./Dialogo_seletor";
 
 interface SummaryCards {
   hasPremiumPlan: boolean;
+  hasCanceledPlan: boolean;
   month: string;
   year: string;
   balance: number;
@@ -25,6 +26,7 @@ interface SummaryCards {
 
 const SummaryCards = async ({
   hasPremiumPlan,
+  hasCanceledPlan,
   balance,
   depositsTotal,
   expensesTotal,
@@ -67,7 +69,10 @@ const SummaryCards = async ({
         <Card className="bg-gradient-to-b from-[#131d27] to-[#040b11]">
           <CardHeader className="m-0 flex h-full w-full p-0">
             <CardContent className="flex h-full w-full flex-col items-center justify-center gap-4 p-2">
-              <DialogoSeletor assinatura={hasPremiumPlan} />
+              <DialogoSeletor
+                assinatura={hasPremiumPlan}
+                hasCanceledPlan={hasCanceledPlan}
+              />
 
               <div>
                 {option === "mensal" && (

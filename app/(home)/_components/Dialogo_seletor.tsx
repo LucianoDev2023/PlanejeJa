@@ -21,9 +21,13 @@ import TimeSelectAno from "./time-select-ano";
 // Corrigi a interface, usando a convenção correta
 interface AssinaturaPremium {
   assinatura: boolean;
+  hasCanceledPlan: boolean;
 }
 
-const DialogoSeletor: React.FC<AssinaturaPremium> = ({ assinatura }) => {
+const DialogoSeletor: React.FC<AssinaturaPremium> = ({
+  assinatura,
+  hasCanceledPlan,
+}) => {
   const [selectedOption, setSelectedOption] = useState("mensal");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false); // Estado para controlar o loading
@@ -68,7 +72,7 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({ assinatura }) => {
           </div>
         ) : (
           <div className="flex h-full flex-col items-start justify-between gap-6">
-            {assinatura ? (
+            {assinatura || !hasCanceledPlan ? (
               <p className="font-sans text-sm font-normal text-gray-500">
                 Selecione o perído desejado
               </p>
@@ -100,7 +104,7 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({ assinatura }) => {
                   <SelectItem
                     className={`font-sans text-sm font-normal ${assinatura ? "" : "text-gray-500"}`}
                     value="anual"
-                    disabled={!assinatura}
+                    disabled={assinatura || !hasCanceledPlan}
                   >
                     Anual
                   </SelectItem>
@@ -108,7 +112,7 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({ assinatura }) => {
                   <SelectItem
                     className={`font-sans text-sm font-normal ${assinatura ? "" : "text-gray-500"}`}
                     value="geral"
-                    disabled={!assinatura}
+                    disabled={assinatura || !hasCanceledPlan}
                   >
                     Geral
                   </SelectItem>
@@ -120,7 +124,10 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({ assinatura }) => {
               {/* Condicional para selecionar mês e ano, ou apenas ano, dependendo da opção escolhida */}
               {selectedOption === "mensal" && (
                 <div className="flex w-full items-center justify-center font-sans font-normal">
-                  <TimeSelectMesAno assinatura={assinatura} />
+                  <TimeSelectMesAno
+                    assinatura={assinatura}
+                    hasCanceledPlan={hasCanceledPlan}
+                  />
                 </div>
               )}
               {selectedOption === "anual" && (

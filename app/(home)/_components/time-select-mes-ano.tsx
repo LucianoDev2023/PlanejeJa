@@ -6,7 +6,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ptBR } from "date-fns/locale";
 
-const TimeSelectMesAno = ({ assinatura }: { assinatura: boolean }) => {
+type TimeSelectMesAnoProps = {
+  assinatura: boolean;
+  hasCanceledPlan: boolean;
+};
+
+const TimeSelectMesAno = ({
+  assinatura,
+  hasCanceledPlan,
+}: TimeSelectMesAnoProps) => {
   const { push } = useRouter();
   const searchParams = useSearchParams();
   const monthFromUrl = searchParams.get("month");
@@ -39,7 +47,7 @@ const TimeSelectMesAno = ({ assinatura }: { assinatura: boolean }) => {
     <div className="flex items-center justify-center gap-3">
       <p className="font-sans text-sm font-normal">Escolha o mês</p>
       <DatePicker
-        disabled={!assinatura}
+        disabled={assinatura || !hasCanceledPlan}
         selected={selectedDate}
         onChange={handleDateChange}
         dateFormat="MM/yyyy"
