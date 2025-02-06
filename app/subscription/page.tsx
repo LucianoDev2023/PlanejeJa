@@ -44,7 +44,7 @@ const SubscriptionPage = async () => {
               <Card className="flex w-[300px] flex-col border-2 border-white/20 sm:w-[400px]">
                 <CardHeader className="relative border-b border-solid py-4">
                   <div>
-                    {!hasPremiumPlan && (
+                    {!hasPremiumPlan && !hasCanceledPlan && (
                       // <Badge className="absolute right-16 top-11 bg-primary/10 text-primary">
                       <Badge className="bg-primary/90 text-sm text-white">
                         Ativo
