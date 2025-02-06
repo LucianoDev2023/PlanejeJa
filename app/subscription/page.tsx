@@ -21,7 +21,8 @@ const SubscriptionPage = async () => {
   const currentMonthTransactions = await getCurrentMonthTransactions();
   const hasPremiumPlan = user.publicMetadata.subscriptionPlan == "premium";
   const expiration = user.publicMetadata.expiration;
-  const PlanStatus = user.publicMetadata.subscriptionPlan == "canceled";
+  const hasCanceledPlan =
+    user?.publicMetadata.subscriptionPlanStatus == "canceled";
 
   return (
     <div className="h-full cursor-default bg-gradient-to-b from-[#2b4960] to-[#040b11] caret-transparent">
@@ -107,7 +108,7 @@ const SubscriptionPage = async () => {
               <Card className="flex w-[300px] flex-col rounded-lg border-2 shadow-[2px_2px_10px_rgba(255,255,255,0.8)] sm:w-[400px]">
                 <CardHeader className="relative border-b border-solid py-4">
                   <div className="flex gap-5">
-                    {hasPremiumPlan && (
+                    {(hasPremiumPlan || hasCanceledPlan) && (
                       // <Badge className="absolute right-16 top-11 bg-primary/10 text-primary">
                       <Badge className="bg-primary/90 text-sm text-white">
                         Ativo
@@ -155,7 +156,7 @@ const SubscriptionPage = async () => {
             </div>
             <div className="text-center font-sans text-xs text-gray-500">
               {" "}
-              {PlanStatus ? `Sua assinatura expira em ${expiration}` : ""}
+              {hasCanceledPlan ? `Sua assinatura expira em ${expiration}` : ""}
             </div>
             <FaqPlano />
             <div className="w-full border-t border-gray-700">
