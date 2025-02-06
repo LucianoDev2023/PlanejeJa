@@ -11,13 +11,19 @@ export const POST = async (request: Request) => {
 
   if (!stripeWebhookSecret) {
     console.error("Chave de ambiente STRIPE_WEBHOOK_SECRET não configurada.");
-    return NextResponse.error();
+    return NextResponse.json(
+      { error: "Chave de ambiente STRIPE_WEBHOOK_SECRET não configurada." },
+      { status: 500 },
+    );
   }
 
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
     console.error("Assinatura do Stripe não encontrada.");
-    return NextResponse.error();
+    return NextResponse.json(
+      { error: "Assinatura do Stripe não encontrada." },
+      { status: 400 },
+    );
   }
 
   const rawBody = await request.text();
@@ -31,7 +37,10 @@ export const POST = async (request: Request) => {
     );
   } catch (err) {
     console.error("Erro ao verificar assinatura do webhook:", err);
-    return NextResponse.error();
+    return NextResponse.json(
+      { error: "Erro ao verificar assinatura do webhook." },
+      { status: 400 },
+    );
   }
 
   switch (event.type) {
