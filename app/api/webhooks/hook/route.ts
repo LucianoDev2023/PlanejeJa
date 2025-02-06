@@ -2,145 +2,97 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia",
-});
-
 export const POST = async (request: Request) => {
-  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  if (!stripeWebhookSecret) {
-    console.error("Chave de ambiente STRIPE_WEBHOOK_SECRET não configurada.");
-    return NextResponse.json(
-      { error: "Chave de ambiente STRIPE_WEBHOOK_SECRET não configurada." },
-      { status: 500 },
-    );
+  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.error();
   }
-
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
-    console.error("Assinatura do Stripe não encontrada.");
-    return NextResponse.json(
-      { error: "Assinatura do Stripe não encontrada." },
-      { status: 400 },
-    );
+    return NextResponse.error();
   }
-
-  const rawBody = await request.text();
-
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      stripeWebhookSecret,
-    );
-  } catch (err) {
-    console.error("Erro ao verificar assinatura do webhook:", err);
-    return NextResponse.json(
-      { error: "Erro ao verificar assinatura do webhook." },
-      { status: 400 },
-    );
-  }
+  const text = await request.text();
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-01-27.acacia",
+  });
+  const event = stripe.webhooks.constructEvent(
+    text,
+    signature,
+    process.env.STRIPE_WEBHOOK_SECRET,
+  );
 
   switch (event.type) {
-    case "invoice.paid":
-      await handleInvoicePaid(event);
-      break;
-    case "customer.subscription.deleted":
-      await handleSubscriptionDeleted(event);
-      break;
-    case "customer.subscription.updated":
-      await handleSubscriptionUpdated(event);
-      break;
-    default:
-      console.log(`Evento não tratado: ${event.type}`);
-  }
-
-  return NextResponse.json({ received: true });
-};
-
-const handleInvoicePaid = async (event: Stripe.Event) => {
-  const invoice = event.data.object as Stripe.Invoice;
-  const amount = invoice.amount_paid; // Aqui você obtém o valor pago
-  console.log("Valor pago: ", amount);
-  const clerkUserId = invoice.subscription_details?.metadata?.clerk_user_id;
-
-  if (!clerkUserId) {
-    console.error("Clerk User ID não encontrado.");
-    return;
-  }
-
-  try {
-    await clerkClient.users.updateUser(clerkUserId, {
-      privateMetadata: {
-        stripeCustomerId: invoice.customer,
-        stripeSubscriptionId: invoice.subscription,
-      },
-      publicMetadata: {
-        subscriptionPlan: "premium",
-      },
-    });
-  } catch (err) {
-    console.error("Erro ao atualizar usuário no Clerk:", err);
-  }
-};
-
-const handleSubscriptionDeleted = async (event: Stripe.Event) => {
-  const subscription = event.data.object as Stripe.Subscription;
-  const clerkUserId = subscription.metadata.clerk_user_id;
-
-  if (!clerkUserId) {
-    console.error("Clerk User ID não encontrado.");
-    return;
-  }
-
-  try {
-    await clerkClient.users.updateUser(clerkUserId, {
-      privateMetadata: {
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-      },
-      publicMetadata: {
-        subscriptionPlan: null,
-      },
-    });
-  } catch (err) {
-    console.error("Erro ao atualizar usuário no Clerk:", err);
-  }
-};
-
-const handleSubscriptionUpdated = async (event: Stripe.Event) => {
-  const subscription = event.data.object as Stripe.Subscription;
-
-  if (subscription.cancellation_details?.reason === "cancellation_requested") {
-    const clerkUserId = subscription.metadata.clerk_user_id;
-    const expirationDate = new Date(subscription.current_period_end * 1000);
-    const formattedExpirationDate = expirationDate.toLocaleDateString("pt-BR");
-
-    console.log(
-      "Cancelamento solicitado. Data de expiração:",
-      formattedExpirationDate,
-    );
-
-    if (!clerkUserId) {
-      console.error("Clerk User ID não encontrado.");
-      return;
-    }
-
-    try {
-      await clerkClient.users.updateUser(clerkUserId, {
+    case "invoice.paid": {
+      console.log("invoice.paid");
+      // Atualizar o usuário com o seu novo plano
+      const { customer, subscription, subscription_details } =
+        event.data.object;
+      const clerkUserId = subscription_details?.metadata?.clerk_user_id;
+      if (!clerkUserId) {
+        return NextResponse.error();
+      }
+      await clerkClient().users.updateUser(clerkUserId, {
         privateMetadata: {
-          stripeSubscriptionId: subscription.id,
-          subscriptionExpiration: formattedExpirationDate,
+          stripeCustomerId: customer,
+          stripeSubscriptionId: subscription,
         },
         publicMetadata: {
-          subscriptionPlanStatus: "canceled",
-          expiration: formattedExpirationDate,
+          subscriptionPlan: "premium",
         },
       });
-    } catch (err) {
-      console.error("Erro ao atualizar usuário no Clerk:", err);
+      break;
+    }
+
+    case "customer.subscription.deleted": {
+      console.log("customer.subscription.deleted");
+      // Remover plano premium do usuário
+      const subscription = await stripe.subscriptions.retrieve(
+        event.data.object.id,
+      );
+      const clerkUserId = subscription.metadata.clerk_user_id;
+      if (!clerkUserId) {
+        return NextResponse.error();
+      }
+      await clerkClient().users.updateUser(clerkUserId, {
+        privateMetadata: {
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+        },
+        publicMetadata: {
+          subscriptionPlan: null,
+        },
+      });
+    }
+
+    case "customer.subscription.updated": {
+      console.log("customer.subscription.updated");
+      // Identificar solicitação de cancelamento
+      const subscription = event.data.object as Stripe.Subscription;
+      if (
+        subscription.cancellation_details?.reason === "cancellation_requested"
+      ) {
+        const clerkUserId = subscription.metadata.clerk_user_id;
+        const expirationDate = new Date(subscription.current_period_end * 1000); // Convertendo timestamp para Date
+        console.log("Cancelamente solicitado data:", expirationDate);
+
+        if (!clerkUserId) {
+          return NextResponse.error();
+        }
+
+        await clerkClient.users.updateUser(clerkUserId, {
+          privateMetadata: {
+            stripeSubscriptionId: subscription.id,
+            subscriptionExpiration: expirationDate.toISOString(), // Salvando a data de expiração
+          },
+          publicMetadata: {
+            subscriptionPlanStatus: "canceled",
+          },
+        });
+      }
+      break;
     }
   }
+  return NextResponse.json({
+    message: "Plano cancelado com sucesso!",
+    received: true,
+  });
 };
