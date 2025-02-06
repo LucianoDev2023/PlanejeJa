@@ -20,7 +20,7 @@ const SubscriptionPage = async () => {
   const firstName = user.firstName;
   const currentMonthTransactions = await getCurrentMonthTransactions();
   const hasPremiumPlan = user.publicMetadata.subscriptionPlan == "premium";
-  const expiration = user?.publicMetadata.expiration == "canceled";
+  const expiration = user?.publicMetadata.expiration == "";
 
   return (
     <div className="h-full cursor-default bg-gradient-to-b from-[#2b4960] to-[#040b11] caret-transparent">
