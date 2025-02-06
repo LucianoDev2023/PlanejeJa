@@ -42,7 +42,8 @@ export default function PaymentButton() {
   const { user } = useUser();
   const hasPremiumPlan = user?.publicMetadata.subscriptionPlan == "premium";
 
-  const hasCanceledPlan = user?.publicMetadata.subscriptionPlan == "canceled";
+  const hasCanceledPlan =
+    user?.publicMetadata.subscriptionPlanStatus == "canceled";
 
   if (!hasPremiumPlan) {
     return (

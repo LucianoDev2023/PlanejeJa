@@ -154,7 +154,7 @@ const SubscriptionPage = async () => {
             </div>
             <div className="text-center font-sans text-xs text-gray-500">
               {" "}
-              {expiration ? `Assinatura experia em ${expiration}` : ""}
+              {expiration ? `Sua assinatura expira em ${expiration}` : ""}
             </div>
             <FaqPlano />
             <div className="w-full border-t border-gray-700">
