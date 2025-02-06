@@ -62,7 +62,8 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
   const hasCanceledPlan =
     user.publicMetadata.subscriptionPlanStatus == "canceled";
 
-  if (!hasPremiumPlan || !hasCanceledPlan) {
+  if (!hasPremiumPlan || hasCanceledPlan) {
+    console.log(user?.publicMetadata);
     throw new Error("You need a premium plan to generate AI reports");
   }
 
