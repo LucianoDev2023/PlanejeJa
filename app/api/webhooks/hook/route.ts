@@ -44,6 +44,7 @@ export const POST = async (request: Request) => {
 
     case "customer.subscription.deleted": {
       console.log("customer.subscription.deleted");
+      console.log(`Assinatura ${event.data.object.id} foi encerrada.`);
       // Remover plano premium do usuário
       const subscription = await stripe.subscriptions.retrieve(
         event.data.object.id,
@@ -58,7 +59,8 @@ export const POST = async (request: Request) => {
           stripeSubscriptionId: null,
         },
         publicMetadata: {
-          subscriptionPlan: null,
+          subscriptionPlan: "Básico",
+          subscriptionPlanStatus: "Encerrada",
         },
       });
     }
