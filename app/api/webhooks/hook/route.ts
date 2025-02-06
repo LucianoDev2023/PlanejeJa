@@ -99,6 +99,7 @@ export const POST = async (request: Request) => {
         subscription.cancel_at_period_end === false &&
         subscription.status === "active"
       ) {
+        console.log("Assinatura reativada!");
         {
           const clerkUserId = subscription.metadata.clerk_user_id;
           if (!clerkUserId) {
@@ -107,13 +108,13 @@ export const POST = async (request: Request) => {
 
           await clerkClient().users.updateUser(clerkUserId, {
             privateMetadata: {
-              stripeSubscriptionId: subscription,
+              stripeSubscriptionId: subscription.id,
             },
             publicMetadata: {
               subscriptionPlan: "premium",
             },
           });
-          console.log("Assinatura reativada!");
+
           break;
         }
       }
