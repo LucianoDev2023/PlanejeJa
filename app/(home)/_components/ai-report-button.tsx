@@ -21,10 +21,15 @@ import { jsPDF } from "jspdf";
 
 interface AiReportButtonProps {
   hasPremiumPlan: boolean;
+  hasCanceledPlan: boolean;
   month: string;
 }
 
-const AiReportButton = ({ month, hasPremiumPlan }: AiReportButtonProps) => {
+const AiReportButton = ({
+  month,
+  hasPremiumPlan,
+  hasCanceledPlan,
+}: AiReportButtonProps) => {
   const [report, setReport] = useState<string | null>(null);
   const [reportIsLoading, setReportIsLoading] = useState(false);
 
@@ -85,7 +90,7 @@ const AiReportButton = ({ month, hasPremiumPlan }: AiReportButtonProps) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[600px]">
-        {hasPremiumPlan ? (
+        {hasPremiumPlan || hasCanceledPlan ? (
           <>
             <DialogHeader>
               <DialogTitle>Relatório IA</DialogTitle>

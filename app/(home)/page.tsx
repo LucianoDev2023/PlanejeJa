@@ -80,6 +80,9 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
               hasPremiumPlan={
                 user.publicMetadata.subscriptionPlan === "premium"
               }
+              hasCanceledPlan={
+                user?.publicMetadata.subscriptionPlanStatus == "canceled"
+              }
             />
             {/* <TimeSelect /> */}
           </div>

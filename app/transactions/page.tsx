@@ -27,6 +27,8 @@ const TransactionsPage = async ({
   await clerkClient().users.getUser(userId);
   const user = await clerkClient().users.getUser(userId);
   const assinado = user.publicMetadata.subscriptionPlan === "premium";
+  const hasCanceledPlan =
+    user?.publicMetadata.subscriptionPlanStatus == "canceled";
 
   const monthIsInvalid = !month || !isMatch(month, "MM");
   const yearIsInvalid = !year || !isMatch(year, "yyyy");
@@ -101,7 +103,7 @@ const TransactionsPage = async ({
           <div className="flex h-full flex-1 flex-col gap-2">
             <div className="flex w-full flex-col items-center justify-center gap-2 sm:flex-row">
               <p className="flex items-center justify-center px-4 text-center font-sans font-normal">
-                {assinado ? (
+                {assinado || hasCanceledPlan ? (
                   "Selecione o perído desejado"
                 ) : (
                   <span className="font-sans font-normal text-gray-500">
