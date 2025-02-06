@@ -63,6 +63,7 @@ export const POST = async (request: Request) => {
           subscriptionPlanStatus: "Encerrada",
         },
       });
+      break;
     }
 
     case "customer.subscription.updated": {
