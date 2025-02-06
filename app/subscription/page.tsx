@@ -20,6 +20,7 @@ const SubscriptionPage = async () => {
   const firstName = user.firstName;
   const currentMonthTransactions = await getCurrentMonthTransactions();
   const hasPremiumPlan = user.publicMetadata.subscriptionPlan == "premium";
+  const expiration = user?.publicMetadata.expiration;
 
   return (
     <div className="h-full cursor-default bg-gradient-to-b from-[#2b4960] to-[#040b11] caret-transparent">
@@ -150,6 +151,10 @@ const SubscriptionPage = async () => {
                   <PaymentButton />
                 </CardContent>
               </Card>
+            </div>
+            <div className="text-center font-sans text-xs text-gray-500">
+              {" "}
+              {expiration ? `Assinatura experia em ${expiration}` : ""}
             </div>
             <FaqPlano />
             <div className="w-full border-t border-gray-700">

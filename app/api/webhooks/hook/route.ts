@@ -116,8 +116,12 @@ const handleSubscriptionUpdated = async (event: Stripe.Event) => {
   if (subscription.cancellation_details?.reason === "cancellation_requested") {
     const clerkUserId = subscription.metadata.clerk_user_id;
     const expirationDate = new Date(subscription.current_period_end * 1000);
+    const formattedExpirationDate = expirationDate.toLocaleDateString("pt-BR");
 
-    console.log("Cancelamento solicitado. Data de expiração:", expirationDate);
+    console.log(
+      "Cancelamento solicitado. Data de expiração:",
+      formattedExpirationDate,
+    );
 
     if (!clerkUserId) {
       console.error("Clerk User ID não encontrado.");
@@ -128,10 +132,11 @@ const handleSubscriptionUpdated = async (event: Stripe.Event) => {
       await clerkClient.users.updateUser(clerkUserId, {
         privateMetadata: {
           stripeSubscriptionId: subscription.id,
-          subscriptionExpiration: expirationDate.toISOString(),
+          subscriptionExpiration: formattedExpirationDate,
         },
         publicMetadata: {
           subscriptionPlanStatus: "canceled",
+          expiration: formattedExpirationDate,
         },
       });
     } catch (err) {
