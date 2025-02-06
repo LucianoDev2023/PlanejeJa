@@ -43,7 +43,6 @@ export const POST = async (request: Request) => {
     }
 
     case "customer.subscription.deleted": {
-      console.log("customer.subscription.deleted");
       console.log(`Assinatura ${event.data.object.id} foi encerrada.`);
       // Remover plano premium do usuário
       const subscription = await stripe.subscriptions.retrieve(
@@ -94,7 +93,31 @@ export const POST = async (request: Request) => {
             subscriptionExpiration: formattedExpirationDate,
           },
         });
+        break;
       }
+      if (
+        subscription.cancel_at_period_end === false &&
+        subscription.status === "active"
+      ) {
+        {
+          const clerkUserId = subscription.metadata.clerk_user_id;
+          if (!clerkUserId) {
+            return NextResponse.error();
+          }
+
+          await clerkClient().users.updateUser(clerkUserId, {
+            privateMetadata: {
+              stripeSubscriptionId: subscription,
+            },
+            publicMetadata: {
+              subscriptionPlan: "premium",
+            },
+          });
+          console.log("Assinatura reativada!");
+          break;
+        }
+      }
+
       break;
     }
   }
