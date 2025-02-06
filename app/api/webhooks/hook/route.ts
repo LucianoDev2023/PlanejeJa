@@ -62,6 +62,8 @@ export const POST = async (request: Request) => {
 
 const handleInvoicePaid = async (event: Stripe.Event) => {
   const invoice = event.data.object as Stripe.Invoice;
+  const amount = invoice.amount_paid; // Aqui você obtém o valor pago
+  console.log("Valor pago: ", amount);
   const clerkUserId = invoice.subscription_details?.metadata?.clerk_user_id;
 
   if (!clerkUserId) {
