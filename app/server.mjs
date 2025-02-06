@@ -1,4 +1,6 @@
-import { clerkClient } from "@clerk/nextjs/server";
+import pkg from "@clerk/nextjs/server";
+const { clerkClient } = pkg;
+
 import cron from "node-cron";
 
 async function verificarAssinaturasExpiradas() {
