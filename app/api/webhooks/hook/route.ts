@@ -71,8 +71,11 @@ export const POST = async (request: Request) => {
         subscription.cancellation_details?.reason === "cancellation_requested"
       ) {
         const clerkUserId = subscription.metadata.clerk_user_id;
-        const expirationDate = new Date(subscription.current_period_end * 1000); // Convertendo timestamp para Date
-        console.log("Cancelamente solicitado data:", expirationDate);
+        const expirationDate = new Date(subscription.current_period_end * 1000);
+        const formattedExpirationDate =
+          expirationDate.toLocaleDateString("pt-BR");
+
+        console.log("Cancelamente solicitado data:", formattedExpirationDate);
 
         if (!clerkUserId) {
           return NextResponse.error();
@@ -81,10 +84,11 @@ export const POST = async (request: Request) => {
         await clerkClient.users.updateUser(clerkUserId, {
           privateMetadata: {
             stripeSubscriptionId: subscription.id,
-            subscriptionExpiration: expirationDate.toISOString(), // Salvando a data de expiração
+            // Salvando a data de expiração
           },
           publicMetadata: {
             subscriptionPlanStatus: "canceled",
+            subscriptionExpiration: formattedExpirationDate,
           },
         });
       }

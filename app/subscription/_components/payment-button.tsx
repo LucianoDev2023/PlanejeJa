@@ -42,15 +42,12 @@ export default function PaymentButton() {
   const { user } = useUser();
   const hasPremiumPlan = user?.publicMetadata.subscriptionPlan == "premium";
 
-  const hasCanceledPlan =
-    user?.publicMetadata.subscriptionPlanStatus == "canceled";
-
   if (!hasPremiumPlan) {
     return (
       <Dialog>
         <DialogTrigger asChild>
           <Button className="w-full rounded-lg font-bold">
-            {hasCanceledPlan ? "Reativar plano" : "Adquirir plano"}
+            Adquirir plano
           </Button>
         </DialogTrigger>
         {/* <DialogContent> */}
