@@ -59,7 +59,10 @@ export const generateAiReport = async ({ month }: GenerateAiReportSchema) => {
 
   const user = await clerkClient().users.getUser(userId);
   const hasPremiumPlan = user.publicMetadata.subscriptionPlan === "premium";
-  if (!hasPremiumPlan) {
+  const hasCanceledPlan =
+    user.publicMetadata.subscriptionPlanStatus == "canceled";
+
+  if (!hasPremiumPlan || !hasCanceledPlan) {
     throw new Error("You need a premium plan to generate AI reports");
   }
 
