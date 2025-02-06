@@ -20,7 +20,8 @@ const SubscriptionPage = async () => {
   const firstName = user.firstName;
   const currentMonthTransactions = await getCurrentMonthTransactions();
   const hasPremiumPlan = user.publicMetadata.subscriptionPlan == "premium";
-  const expiration = user?.publicMetadata.expiration == "";
+  const expiration = user.publicMetadata.expiration;
+  const PlanStatus = user.publicMetadata.subscriptionPlan == "canceled";
 
   return (
     <div className="h-full cursor-default bg-gradient-to-b from-[#2b4960] to-[#040b11] caret-transparent">
@@ -85,7 +86,7 @@ const SubscriptionPage = async () => {
                       </p>
                     </div>
                   )}
-                  {(hasPremiumPlan || expiration) && (
+                  {hasPremiumPlan && (
                     <div className="flex items-center gap-2">
                       <CheckIcon className="text-primary" size={20} />
                       <p className="text-sm">Limite de 10 transações por mês</p>
@@ -154,7 +155,7 @@ const SubscriptionPage = async () => {
             </div>
             <div className="text-center font-sans text-xs text-gray-500">
               {" "}
-              {expiration ? `Sua assinatura expira em ${expiration}` : ""}
+              {PlanStatus ? `Sua assinatura expira em ${expiration}` : ""}
             </div>
             <FaqPlano />
             <div className="w-full border-t border-gray-700">
