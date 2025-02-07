@@ -92,7 +92,7 @@ const TimeSelectTransactions: React.FC<AssinaturaPremium> = ({
                 {MONTH_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <span
-                      className={`${assinatura ? "text-white" : "text-gray-500"}`}
+                      className={`${assinatura || cancelPlan ? "text-white" : "text-gray-500"}`}
                     >
                       {option.label}
                     </span>
@@ -104,19 +104,19 @@ const TimeSelectTransactions: React.FC<AssinaturaPremium> = ({
               <button
                 disabled={assinatura || !cancelPlan}
                 onClick={() => handleYearChange(false)}
-                className={`flex h-8 w-8 items-center ${assinatura ? "text-white" : "text-gray-500"} justify-center rounded-lg bg-[#111A21]`}
+                className={`flex h-8 w-8 items-center ${assinatura || cancelPlan ? "text-white" : "text-gray-500"} justify-center rounded-lg bg-[#111A21]`}
               >
                 &lt;
               </button>
               <span
-                className={`sm:text-md text-xs ${assinatura ? "text-white" : "text-gray-500"}`}
+                className={`sm:text-md text-xs ${assinatura || cancelPlan ? "text-white" : "text-gray-500"}`}
               >
                 {year}
               </span>
               <button
                 disabled={assinatura || !cancelPlan}
                 onClick={() => handleYearChange(true)}
-                className={`flex h-8 w-8 items-center ${assinatura ? "text-white" : "text-gray-500"} justify-center rounded-lg bg-[#111A21]`}
+                className={`flex h-8 w-8 items-center ${assinatura || cancelPlan ? "text-white" : "text-gray-500"} justify-center rounded-lg bg-[#111A21]`}
               >
                 &gt;
               </button>

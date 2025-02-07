@@ -102,7 +102,7 @@ const TransactionsPage = async ({
         <div className="flex h-full cursor-default flex-col gap-2 sm:flex-row">
           <div className="flex h-full flex-1 flex-col gap-2">
             <div className="flex w-full flex-col items-center justify-center gap-2 sm:flex-row">
-              <p className="flex items-center justify-center px-4 text-center font-sans font-normal">
+              <p className="sm:text-md flex items-center justify-center px-4 text-center font-sans font-normal">
                 {assinado || hasCanceledPlan ? (
                   "Selecione o perído desejado"
                 ) : (
