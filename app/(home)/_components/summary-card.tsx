@@ -43,6 +43,7 @@ const SummaryCard = ({
             } flex items-center`}
           >
             {title}
+
             {title === "Saldo" && (
               <button
                 onClick={toggleAmountVisibility}
@@ -64,40 +65,41 @@ const SummaryCard = ({
               title === "Saldo" ? "justify-between" : "justify-center"
             }`}
           >
-            <p
-              className={`flex items-center justify-center gap-4 text-center font-bold sm:text-lg ${
-                isAmountVisible
-                  ? amount < 0
-                    ? "text-red-500"
-                    : "text-white"
-                  : "text-white/50"
-              } ${title === "Saldo" ? "text-sm" : "text-xs"}`}
-            >
-              <div className="flex items-center justify-center">
+            <div>
+              <div className="flex items-center justify-center py-2">
                 {title === "Saldo" && isAmountVisible && (
-                  <>
-                    <TrendingUpIcon className="h-2 w-2 items-center justify-center text-primary md:h-4 md:w-4" />
-                    <span className="flex h-2 w-2 items-center justify-center text-xs text-gray-500 md:h-4 md:w-4">
+                  <div className="flex px-2">
+                    <TrendingUpIcon className="h-4 w-4 items-center justify-center text-primary" />
+                    <span className="flex h-4 w-4 items-center justify-center p-1 text-xs text-gray-500">
                       +
                     </span>
-                    <PiggyBankIcon className="h-2 w-2 items-center justify-center text-[#60FFFA] md:h-4 md:w-4" />
-                    <span className="flex h-2 w-2 items-center justify-center text-xs text-gray-500 md:h-4 md:w-4">
+                    <PiggyBankIcon className="h-4 w-4 items-center justify-center text-[#60FFFA]" />
+                    <span className="flex h-4 w-4 items-center justify-center p-1 text-xs text-gray-500">
                       -
                     </span>
                     {
-                      <TrendingDownIcon className="h-2 w-2 items-center justify-center text-red-500 md:h-4 md:w-4" />
+                      <TrendingDownIcon className="h-4 w-4 items-center justify-center text-red-500" />
                     }
-                  </>
+                  </div>
                 )}
               </div>
-
-              {isAmountVisible
-                ? Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(amount)
-                : "R$ ****"}
-            </p>
+              <p
+                className={`flex items-center justify-center gap-4 text-center font-bold sm:text-lg ${
+                  isAmountVisible
+                    ? amount < 0
+                      ? "text-red-500"
+                      : "text-white"
+                    : "text-white/50"
+                } ${title === "Saldo" ? "text-sm" : "text-xs"}`}
+              >
+                {isAmountVisible
+                  ? Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(amount)
+                  : "R$ ****"}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
