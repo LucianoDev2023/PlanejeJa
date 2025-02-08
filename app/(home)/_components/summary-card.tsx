@@ -32,7 +32,7 @@ const SummaryCard = ({
         <CardHeader
           className={`${
             title === "Saldo" ? "flex-row" : "flex-col"
-          } m-0 items-center justify-center gap-2 p-2 sm:justify-start sm:p-4`}
+          } m-0 items-center justify-start gap-2 p-2 sm:p-4`}
         >
           {icon}
           <p
@@ -43,7 +43,6 @@ const SummaryCard = ({
             } flex items-center`}
           >
             {title}
-
             {title === "Saldo" && (
               <button
                 onClick={toggleAmountVisibility}
@@ -65,7 +64,7 @@ const SummaryCard = ({
               title === "Saldo" ? "justify-between" : "justify-center"
             }`}
           >
-            <div>
+            <div className="flex w-full flex-col items-center justify-center">
               <div className="flex items-center justify-center">
                 {title === "Saldo" && isAmountVisible && (
                   <div className="flex px-2">
