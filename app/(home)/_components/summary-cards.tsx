@@ -108,20 +108,20 @@ const SummaryCards = async ({
           />
         </Link>
 
-        <Link href="/transactions?type=EXPENSE">
-          <SummaryCard
-            icon={<TrendingDownIcon size={16} className="text-red-500" />}
-            title="Despesas"
-            amount={expensesTotal}
-            size="large"
-          />
-        </Link>
-
         <Link href="/transactions?type=INVESTMENT">
           <SummaryCard
             icon={<PiggyBankIcon size={16} className="text-[#60FFFA]" />}
             title="Investido"
             amount={investmentsTotal}
+            size="large"
+          />
+        </Link>
+
+        <Link href="/transactions?type=EXPENSE">
+          <SummaryCard
+            icon={<TrendingDownIcon size={16} className="text-red-500" />}
+            title="Despesas"
+            amount={expensesTotal}
             size="large"
           />
         </Link>

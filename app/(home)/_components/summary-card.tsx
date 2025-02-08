@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importando ícones de olho
-import { PiggyBankIcon, TrendingUpIcon } from "lucide-react";
+import { PiggyBankIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 
 interface SummaryCardProps {
   icon: React.ReactNode;
@@ -78,7 +78,9 @@ const SummaryCard = ({
                   <>
                     <TrendingUpIcon size={16} className="text-primary" />{" "}
                     <span className="text-xs text-gray-500">+</span>{" "}
-                    <PiggyBankIcon size={16} className="text-[#60FFFA]" />
+                    <PiggyBankIcon size={16} className="text-[#60FFFA]" />{" "}
+                    <span className="text-xs text-gray-500">-</span>{" "}
+                    {<TrendingDownIcon size={16} className="text-red-500" />}
                   </>
                 )}
               </div>
