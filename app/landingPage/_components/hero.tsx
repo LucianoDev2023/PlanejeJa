@@ -27,7 +27,7 @@ const Hero = () => {
             </p>
             <div className="pb-6">
               <a
-                href="#"
+                href="https://planejeja.com.br/"
                 className="items-center justify-center rounded-md bg-primary px-5 py-2 font-bold"
               >
                 Experimente grátis
