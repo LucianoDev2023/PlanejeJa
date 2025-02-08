@@ -161,7 +161,7 @@ export const getDashboardTotal = async (
   const lastTransactions = await db.transaction.findMany({
     where,
     orderBy: { date: "desc" },
-    take: 8,
+    take: 10,
   });
   return {
     balanceSun,
