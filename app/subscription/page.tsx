@@ -64,19 +64,21 @@ const SubscriptionPage = async () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6 py-8">
-                  {currentMonthTransactions === 10 && !hasPremiumPlan && (
-                    <div className="flex items-center gap-2">
-                      <HandIcon className="text-red-600" size={16} />
-                      <p className="text-sm">
-                        O limite do plano básico foi <br />
-                        atingido (
-                        <span className="font-bold text-red-600">
-                          {currentMonthTransactions}
-                        </span>{" "}
-                        de 10 disponíveis)
-                      </p>
-                    </div>
-                  )}
+                  {currentMonthTransactions === 10 &&
+                    !hasPremiumPlan &&
+                    !hasCanceledPlan && (
+                      <div className="flex items-center gap-2">
+                        <HandIcon className="text-red-600" size={16} />
+                        <p className="text-sm">
+                          O limite do plano básico foi <br />
+                          atingido (
+                          <span className="font-bold text-red-600">
+                            {currentMonthTransactions}
+                          </span>{" "}
+                          de 10 disponíveis)
+                        </p>
+                      </div>
+                    )}
                   {currentMonthTransactions < 10 && !hasPremiumPlan && (
                     <div className="flex items-center gap-2">
                       <CheckIcon className="text-primary" />
