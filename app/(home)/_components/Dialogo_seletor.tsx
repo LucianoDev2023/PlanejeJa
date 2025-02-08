@@ -72,7 +72,7 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({
           </div>
         ) : (
           <div className="flex h-full flex-col items-start justify-between gap-6">
-            {assinatura || !hasCanceledPlan ? (
+            {assinatura || hasCanceledPlan ? (
               <p className="font-sans text-sm font-normal text-gray-500">
                 Selecione o perído desejado
               </p>
@@ -102,17 +102,17 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({
                     Mensal
                   </SelectItem>
                   <SelectItem
-                    className={`font-sans text-sm font-normal ${assinatura ? "" : "text-gray-500"}`}
+                    className={`font-sans text-sm font-normal ${assinatura || hasCanceledPlan ? "" : "text-gray-500"}`}
                     value="anual"
-                    disabled={assinatura || !hasCanceledPlan}
+                    disabled={!assinatura && !hasCanceledPlan}
                   >
                     Anual
                   </SelectItem>
 
                   <SelectItem
-                    className={`font-sans text-sm font-normal ${assinatura ? "" : "text-gray-500"}`}
+                    className={`font-sans text-sm font-normal ${assinatura || hasCanceledPlan ? "" : "text-gray-500"}`}
                     value="geral"
-                    disabled={assinatura || !hasCanceledPlan}
+                    disabled={!assinatura && !hasCanceledPlan}
                   >
                     Geral
                   </SelectItem>

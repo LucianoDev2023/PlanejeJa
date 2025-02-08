@@ -47,7 +47,7 @@ const TimeSelectMesAno = ({
     <div className="flex items-center justify-center gap-3">
       <p className="font-sans text-sm font-normal">Escolha o mês</p>
       <DatePicker
-        disabled={assinatura || !hasCanceledPlan}
+        disabled={!assinatura && !hasCanceledPlan}
         selected={selectedDate}
         onChange={handleDateChange}
         dateFormat="MM/yyyy"
