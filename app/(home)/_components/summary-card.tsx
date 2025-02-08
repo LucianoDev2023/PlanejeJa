@@ -66,7 +66,7 @@ const SummaryCard = ({
             }`}
           >
             <div>
-              <div className="flex items-center justify-center py-2">
+              <div className="flex items-center justify-center">
                 {title === "Saldo" && isAmountVisible && (
                   <div className="flex px-2">
                     <TrendingUpIcon className="h-4 w-4 items-center justify-center text-primary" />
