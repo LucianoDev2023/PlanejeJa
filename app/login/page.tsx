@@ -60,11 +60,12 @@ const LoginPage = async () => {
             {/* Coluna para a imagem */}
             <div className="flex w-full justify-center rounded-lg p-4 sm:p-10">
               <Image
-                src="/bg.png"
+                src="/Midnight.png"
                 width={840}
                 height={547}
                 alt="PlanejeJá"
-                className="rounded-lg border"
+                quality={100}
+                priority
                 style={{
                   // objectFit: "cover",
                   pointerEvents: "none", // Impede qualquer interação com a imagem
