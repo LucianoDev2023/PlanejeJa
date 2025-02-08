@@ -83,7 +83,7 @@ const TimeSelectTransactions: React.FC<AssinaturaPremium> = ({
             <Select
               onValueChange={(value) => handleMonthChange(value)}
               defaultValue={month ?? ""}
-              disabled={assinatura || !cancelPlan}
+              disabled={!assinatura && !cancelPlan}
             >
               <SelectTrigger className="w-[120px] rounded-lg bg-transparent p-2">
                 <SelectValue placeholder="Mês" />
@@ -102,7 +102,7 @@ const TimeSelectTransactions: React.FC<AssinaturaPremium> = ({
             </Select>
             <div className="flex items-center gap-2 rounded-lg border-e-2 border-s-2">
               <button
-                disabled={assinatura || !cancelPlan}
+                disabled={!assinatura && !cancelPlan}
                 onClick={() => handleYearChange(false)}
                 className={`flex h-8 w-8 items-center ${assinatura || cancelPlan ? "text-white" : "text-gray-500"} justify-center rounded-lg bg-[#111A21]`}
               >
@@ -114,7 +114,7 @@ const TimeSelectTransactions: React.FC<AssinaturaPremium> = ({
                 {year}
               </span>
               <button
-                disabled={assinatura || !cancelPlan}
+                disabled={!assinatura && !cancelPlan}
                 onClick={() => handleYearChange(true)}
                 className={`flex h-8 w-8 items-center ${assinatura || cancelPlan ? "text-white" : "text-gray-500"} justify-center rounded-lg bg-[#111A21]`}
               >
