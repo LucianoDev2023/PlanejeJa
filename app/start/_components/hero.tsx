@@ -5,7 +5,7 @@ const Hero = () => {
     <div className="relative overflow-hidden bg-gradient-to-l from-[#5c7a95] to-[#040b11] p-4 text-white">
       <div>
         <Image
-          src="/mobileScreen3.png"
+          src="/mobile4.png"
           alt="Foto mobile"
           className="object-cover opacity-60 md:hidden"
           fill
