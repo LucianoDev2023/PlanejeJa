@@ -73,14 +73,20 @@ const SummaryCard = ({
                   : "text-white/50"
               } ${title === "Saldo" ? "text-sm" : "text-xs"}`}
             >
-              <div className="flex items-center justify-start gap-2">
+              <div className="flex items-center justify-center gap-2">
                 {title === "Saldo" && isAmountVisible && (
                   <>
-                    <TrendingUpIcon size={16} className="text-primary" />{" "}
-                    <span className="text-xs text-gray-500">+</span>{" "}
-                    <PiggyBankIcon size={16} className="text-[#60FFFA]" />{" "}
-                    <span className="text-xs text-gray-500">-</span>{" "}
-                    {<TrendingDownIcon size={16} className="text-red-500" />}
+                    <TrendingUpIcon className="h-2 w-2 items-center justify-center text-primary md:h-4 md:w-4" />
+                    <span className="flex h-2 w-2 items-center justify-center text-xs text-gray-500 md:h-4 md:w-4">
+                      +
+                    </span>
+                    <PiggyBankIcon className="h-2 w-2 items-center justify-center text-[#60FFFA] md:h-4 md:w-4" />
+                    <span className="flex h-2 w-2 items-center justify-center text-xs text-gray-500 md:h-4 md:w-4">
+                      -
+                    </span>
+                    {
+                      <TrendingDownIcon className="h-2 w-2 items-center justify-center text-red-500 md:h-4 md:w-4" />
+                    }
                   </>
                 )}
               </div>

@@ -50,14 +50,14 @@ const TransactionsPieChart = ({
       fill: "#469126",
     },
     {
-      type: TransactionType.EXPENSE,
-      amount: expensesTotal,
-      fill: "#850404",
-    },
-    {
       type: TransactionType.INVESTMENT,
       amount: investmentsTotal,
       fill: "#60FFFA",
+    },
+    {
+      type: TransactionType.EXPENSE,
+      amount: expensesTotal,
+      fill: "#850404",
     },
   ];
   return (
