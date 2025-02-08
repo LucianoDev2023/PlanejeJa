@@ -37,7 +37,7 @@ const Hero = () => {
 
           <div className="relative hidden h-full w-full rounded-lg md:block">
             <Image
-              src="/mobileScreen3.png"
+              src="/mobile4.png"
               alt="Foto mobile"
               className="object-contain"
               width={840}
