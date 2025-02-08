@@ -46,7 +46,7 @@ const Hero = () => {
               priority
             />
             <div>
-              <p className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center justify-center text-sm text-gray-400 shadow-md">
+              <p className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center justify-center bg-transparent text-sm text-gray-400">
                 Planeje, economize, realize.
               </p>
             </div>

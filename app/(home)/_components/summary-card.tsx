@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/app/_components/ui/card";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importando ícones de olho
+import { PiggyBankIcon, TrendingUpIcon } from "lucide-react";
 
 interface SummaryCardProps {
   icon: React.ReactNode;
@@ -64,7 +65,7 @@ const SummaryCard = ({
             }`}
           >
             <p
-              className={`text-center font-bold sm:text-lg ${
+              className={`flex items-center justify-center gap-4 text-center font-bold sm:text-lg ${
                 isAmountVisible
                   ? amount < 0
                     ? "text-red-500"
@@ -72,6 +73,16 @@ const SummaryCard = ({
                   : "text-white/50"
               } ${title === "Saldo" ? "text-sm" : "text-xs"}`}
             >
+              <div className="flex items-center justify-start gap-2">
+                {title === "Saldo" && isAmountVisible && (
+                  <>
+                    <TrendingUpIcon size={16} className="text-primary" />{" "}
+                    <span className="text-xs text-gray-500">+</span>{" "}
+                    <PiggyBankIcon size={16} className="text-[#60FFFA]" />
+                  </>
+                )}
+              </div>
+
               {isAmountVisible
                 ? Intl.NumberFormat("pt-BR", {
                     style: "currency",
