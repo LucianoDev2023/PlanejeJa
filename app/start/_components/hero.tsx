@@ -14,7 +14,7 @@ const Hero = () => {
         />
       </div>
       <div className="absolute inset-0 bg-black opacity-30 md:hidden"></div>
-      <div className="container relative mx-auto w-[85%] px-4">
+      <div className="lg-w-[85%] container relative mx-auto w-[95%] px-4">
         <article className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div className="flex flex-col items-start justify-center space-y-6">
             <h1 className="text-3xl font-bold leading-10 md:text-4xl">
