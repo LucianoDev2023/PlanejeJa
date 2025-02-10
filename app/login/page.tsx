@@ -12,14 +12,14 @@ const LoginPage = async () => {
   }
   return (
     <>
-      <div className="flex flex-col bg-orange-700">
+      <div className="flex flex-col">
         <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-[#03090f] to-[#386289] p-4 sm:flex-row sm:p-8">
           {/* Divisão em duas colunas: uma para o card e a outra para a imagem */}
           <div className="flex h-full max-h-[900px] w-full max-w-7xl flex-col items-center justify-center gap-4 overflow-hidden rounded-lg sm:flex-row">
             {/* Coluna da direita */}
             <div className="flex w-full flex-col">
               <div className="flex items-center justify-center p-4">
-                <div className="flex h-full flex-col items-start justify-center sm:p-40">
+                <div className="flex h-full flex-col items-start justify-center sm:p-20">
                   {/* Header and content */}
                   <div className="flex items-center justify-center gap-1">
                     <Image
@@ -58,7 +58,7 @@ const LoginPage = async () => {
               </div>
             </div>
             {/* Coluna para a imagem */}
-            <div className="flex w-full justify-center rounded-lg p-4 sm:p-10">
+            <div className="mb-10 flex w-full flex-col justify-center rounded-lg pb-10 sm:p-10 lg:p-4">
               <Image
                 src="/Midnight.png"
                 width={840}
@@ -74,11 +74,6 @@ const LoginPage = async () => {
               />
             </div>
           </div>
-        </div>
-        <div>
-          <p className="text-center text-lg text-white/10 sm:p-2">
-            Versão 1.4.0 ©2024
-          </p>
         </div>
       </div>
     </>
