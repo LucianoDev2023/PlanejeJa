@@ -81,7 +81,7 @@ export const getDashboardTotal = async (
     )?._sum?.amount,
   );
 
-  const balance = depositsTotal + investmentsTotal - expensesTotal;
+  const balance = depositsTotal - investmentsTotal - expensesTotal;
   const balanceSun = depositsTotal + investmentsTotal + expensesTotal;
 
   const transactionsTotal = Number(

@@ -70,7 +70,7 @@ const SummaryCard = ({
                   <div className="flex px-2">
                     <TrendingUpIcon className="h-4 w-4 items-center justify-center text-primary opacity-50" />
                     <span className="flex h-4 w-4 items-center justify-center p-1 text-xs text-gray-500">
-                      +
+                      -
                     </span>
                     <PiggyBankIcon className="h-4 w-4 items-center justify-center text-[#60FFFA] opacity-50" />
                     <span className="flex h-4 w-4 items-center justify-center p-1 text-xs text-gray-500">
