@@ -49,7 +49,7 @@ const LandingPage = () => {
           </a>
         </div>
         <p className="text-xs text-gray-400"> Versão 1.4.0 ©2024</p>
-        <p className="pb-2 text-xs text-gray-400">planejeja@gmail.com</p>
+        <p className="pb-2 text-xs text-gray-400">planejejasuporte@gmail.com</p>
       </div>
     </main>
   );
