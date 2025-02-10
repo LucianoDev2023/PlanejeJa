@@ -8,8 +8,8 @@ import { Textarea } from "@/app/_components/ui/textarea";
 import { Button } from "@/app/_components/ui/button";
 
 interface ContactFormProps {
-  email: string;
-  firstName: string | null; // Permite null
+  email?: string;
+  firstName?: string | null; // Permite null
 }
 const ContactForm: React.FC<ContactFormProps> = ({ email, firstName }) => {
   const [message, setMessage] = useState<string>("");

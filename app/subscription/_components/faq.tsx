@@ -13,7 +13,7 @@ export function FaqPlano() {
         collapsible
         className="w-full items-center justify-center p-6 sm:m-0 sm:w-1/2"
       >
-        <div className="space-y-1">
+        <div className="space-y-2">
           <AccordionItem value="item-1 ">
             <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
               <AccordionTrigger>
@@ -61,7 +61,7 @@ export function FaqPlano() {
           </AccordionItem>
           <AccordionItem value="item-4">
             <div className="rounded-lg bg-gradient-to-b from-[#253846] to-[#475b6d] px-2">
-              <AccordionTrigger>
+              <AccordionTrigger className="text-left">
                 Quais são as formas de pagamento?
               </AccordionTrigger>
             </div>

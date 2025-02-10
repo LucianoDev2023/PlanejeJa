@@ -2,23 +2,26 @@ import Image from "next/image";
 
 const Hero = () => {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-l from-[#5c7a95] to-[#040b11] p-4 text-white">
+    <div className="relative overflow-hidden p-4 text-white">
       <div>
         <Image
           src="/mobile4.png"
           alt="Foto mobile"
-          className="object-cover opacity-60 md:hidden"
+          className="object-cover opacity-30 md:hidden"
           fill
           quality={100}
           priority
         />
       </div>
-      <div className="absolute inset-0 bg-black opacity-30 md:hidden"></div>
-      <div className="lg-w-[85%] container relative mx-auto w-[95%] px-4">
-        <article className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          <div className="flex flex-col items-start justify-center space-y-6">
-            <h1 className="text-3xl font-bold leading-10 md:text-4xl">
-              Controle financeiro descomplicado com gestão inteligente.
+      {/* <div className="absolute inset-0 bg-black opacity-30 md:hidden"></div> */}
+      <div className="lg-w-[85%] container relative mx-auto w-[100%] px-4">
+        <article className="grid grid-cols-1 justify-items-center gap-4 md:grid-cols-2">
+          <div className="flex flex-col items-start justify-center space-y-6 lg:w-2/3">
+            <h1 className="mt-12 text-3xl font-bold leading-10 md:text-4xl">
+              Controle financeiro descomplicado com gestão{" "}
+              <span className="rounded-lg font-sans font-bold text-primary">
+                inteligente.
+              </span>
             </h1>
             <p>
               Planeje seu futuro e construa uma jornada financeira sólida. Com
