@@ -170,6 +170,12 @@ const SubscriptionPage = async () => {
             <div className="w-full flex-col items-center justify-center px-6 sm:w-1/3">
               <ContactForm email={email} firstName={firstName} />
             </div>
+            <div className="flex flex-col items-center justify-center pt-2">
+              <p className="text-xs text-gray-700">
+                planejejasuporte@gmail.com
+              </p>
+              <p className="text-xs text-gray-700"> Versão 1.4.0 ©2024</p>
+            </div>
           </div>
         </div>
       </ScrollArea>
