@@ -75,10 +75,15 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
             <AddTransactionButton
               userCanAddTransaction={userCanAddTransaction}
             />
+
             <AiReportButton
               month={month}
-              hasPremiumPlan={user?.publicMetadata?.subscriptionPlan === "premium"}
-  hasCanceledPlan={user?.publicMetadata?.subscriptionPlanStatus === "canceled"}
+              hasPremiumPlan={
+                user?.publicMetadata?.subscriptionPlan === "premium"
+              }
+              hasCanceledPlan={
+                user?.publicMetadata?.subscriptionPlanStatus === "canceled"
+              }
             />
             {/* <TimeSelect /> */}
           </div>
