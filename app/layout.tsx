@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://www.planejeja.com.br/mobile4.png",
+        url: "https://planejeja.com.br/mobile4.png",
         width: 1200,
         height: 630,
         alt: "Imagem de compartilhamento do PlanejeJá",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "PlanejeJá - Controle Financeiro Fácil e Rápido",
     description:
       "Gerencie suas finanças de maneira prática e objetiva com PlanejeJá. Acompanhe seu fluxo de caixa, investimentos e gastos de forma intuitiva.",
-    images: ["https://www.planejeja.com.br/mobile4.png"],
+    images: ["https://planejeja.com.br/mobile4.png"],
   },
 };
 
