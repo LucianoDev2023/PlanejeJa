@@ -13,8 +13,7 @@ import { getDashboardTotal } from "../_data/get-dashboard/index_total";
 import { getYearLimits } from "../_data/get-dashboard/limit_year";
 import AddTransactionButton from "../_components/add-transaction-button";
 import { Card } from "../_components/ui/card";
-import VisibilityToggle from "./_components/VisibilityToggle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface HomeProps {
   searchParams: {
@@ -110,7 +109,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
             />
 
             <div className="flex-1 items-center justify-center">
-              {dashboard.balance === 0 ? (
+              {dashboard.balanceSun === 0 ? (
                 <Card className="m-0 flex h-full items-center justify-center bg-gradient-to-b from-[#131d27] to-[#040b11] p-0 sm:w-full">
                   <div className="flex flex-col gap-2">
                     <p className="text-center text-xs text-gray-500">
