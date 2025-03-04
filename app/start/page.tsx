@@ -1,3 +1,4 @@
+"use client";
 import { useEffect } from "react"; // Para utilizar useEffect
 import Script from "next/script"; // Importando o Script do Next.js
 import { FaqPlano } from "../subscription/_components/faq";
