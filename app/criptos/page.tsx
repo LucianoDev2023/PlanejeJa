@@ -62,7 +62,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col justify-between">
       <Navbar />
-      <div className="flex w-full flex-1 flex-col overflow-y-auto bg-gradient-to-b from-[#0D141A] to-[#080b14] pb-40 sm:pb-10 md:mt-0">
+      <div className="flex w-full flex-1 flex-col overflow-y-auto bg-gradient-to-b from-[#0D141A] to-[#080b14] pb-28 sm:pb-10 md:mt-0">
         <TransactionList
           transactions={transactions}
           tokenPrices={tokenPrices}
