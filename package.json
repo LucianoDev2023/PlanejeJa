@@ -8,10 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky install && npm run prisma:generate",
-    "deploy": "git pull && npm install && npx prisma migrate deploy --schema=./prisma/schema.prisma && next build && NODE_ENV=production pm2 restart nextjs-app",
-    "prisma:migrate": "npx prisma migrate dev --schema=./prisma/schema.prisma",
-    "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
-    "prisma:studio": "npx prisma studio --schema=./prisma/schema.prisma"
+    "deploy": "git pull && npm install && npx prisma migrate deploy --schema=./prisma/schema.prisma && next build && NODE_ENV=production pm2 restart nextjs-app"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.7.5",
