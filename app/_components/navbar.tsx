@@ -21,6 +21,7 @@ const Navbar = () => {
     { href: "/", label: "Início" },
     { href: "/transactions", label: "Transações" },
     { href: "/subscription", label: "Assinatura" },
+    { href: "/criptos", label: "Criptos" },
   ];
 
   const isHome = pathname === "/";
