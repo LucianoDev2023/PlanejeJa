@@ -65,7 +65,7 @@ export default function TransactionCard({
     <Card className="m-2 border-transparent bg-gradient-to-b from-[#131D27] to-[#0f273d] p-0 text-gray-300">
       <CardContent className="flex items-center justify-center p-1 px-3">
         {isDeleting ? (
-          <Loader2 className="h-6 w-6 animate-spin text-white" />
+          <Loader2 className="h-20 w-6 animate-spin text-white sm:h-8" />
         ) : (
           <div className="grid w-full grid-cols-1 items-center justify-center text-left md:grid-cols-7">
             <p className="col-span-1 break-words text-xs font-semibold">
