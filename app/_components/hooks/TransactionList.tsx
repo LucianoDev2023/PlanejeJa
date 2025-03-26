@@ -62,18 +62,20 @@ export default function TransactionList({
 
   return (
     <div className="flex w-full flex-col gap-1">
-      <TradeForm
-        onAddTransaction={(newTransaction) =>
-          setTransactions((prev) => [...prev, newTransaction])
-        }
-        onUpdateTransaction={handleUpdateTransaction}
-        transactionBeingEdited={transactionBeingEdited}
-        clearEditing={clearEditing}
-        tokenPrices={tokenPrices}
-        selectedToken={transactionBeingEdited?.token || selectedToken}
-        setSelectedToken={setSelectedToken}
-        tokens={tokens}
-      />
+      <div className="sticky top-0 z-10 bg-[#060D13]">
+        <TradeForm
+          onAddTransaction={(newTransaction) =>
+            setTransactions((prev) => [...prev, newTransaction])
+          }
+          onUpdateTransaction={handleUpdateTransaction}
+          transactionBeingEdited={transactionBeingEdited}
+          clearEditing={clearEditing}
+          tokenPrices={tokenPrices}
+          selectedToken={transactionBeingEdited?.token || selectedToken}
+          setSelectedToken={setSelectedToken}
+          tokens={tokens}
+        />
+      </div>
 
       {loading ? (
         Array.from({ length: 4 }).map((_, i) => (

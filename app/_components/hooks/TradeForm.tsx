@@ -183,7 +183,10 @@ export default function TradeForm({
             onValueChange={(value) => setSelectedToken(value)}
             value={selectedToken}
           >
-            <SelectTrigger className="w-full border border-gray-600 text-xs text-white/70">
+            <SelectTrigger
+              disabled={isSubmitting}
+              className="w-full border border-gray-600 text-xs text-white/70"
+            >
               <SelectValue placeholder="Selecione um Token" />
             </SelectTrigger>
             <SelectContent>
@@ -203,6 +206,7 @@ export default function TradeForm({
 
         <div className="flex flex-col">
           <Select
+            disabled={isSubmitting}
             value={formData.type}
             onValueChange={(value) =>
               setFormData((prev) => ({
@@ -226,6 +230,7 @@ export default function TradeForm({
 
         <div className="flex flex-col">
           <Input
+            disabled={isSubmitting}
             type="number"
             value={formData.usdValue}
             onChange={(e) => handleInputChange(e, "usdValue")}
@@ -242,6 +247,7 @@ export default function TradeForm({
 
         <div className="flex flex-col">
           <Input
+            disabled={isSubmitting}
             type="number"
             value={formData.price}
             onChange={(e) => handleInputChange(e, "price")}
@@ -259,6 +265,7 @@ export default function TradeForm({
         {formData.type === "sell" && (
           <div className="flex flex-col">
             <Input
+              disabled={isSubmitting}
               type="number"
               value={formData.sellTokenPrice}
               onChange={(e) => handleInputChange(e, "sellTokenPrice")}
@@ -278,10 +285,10 @@ export default function TradeForm({
           <p className="pt-1 text-xs text-blue-600 md:text-sm">Quantidade</p>
         </div>
 
-        <div className="flex w-full items-start justify-center">
+        <div className="flex w-full items-start justify-start">
           <Button
             type="submit"
-            className="flex w-full items-center justify-center gap-2 bg-[#56B22E] hover:bg-[#4B9C28]"
+            className="flex w-fit items-center justify-center gap-2 bg-[#56B22E] hover:bg-[#4B9C28]"
             disabled={isSubmitting}
           >
             {isSubmitting && (
