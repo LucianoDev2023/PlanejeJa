@@ -81,7 +81,7 @@ export default function TransactionList({
         Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="mx-2 flex h-10 animate-pulse rounded-lg bg-gradient-to-b from-[#131d276e] to-[#0f273d6b]"
+            className="mx-2 mt-4 flex h-20 animate-pulse rounded-lg bg-gradient-to-b from-[#131d276e] to-[#0f273d6b] sm:h-10"
           ></div>
         ))
       ) : transactions.length === 0 ? (
