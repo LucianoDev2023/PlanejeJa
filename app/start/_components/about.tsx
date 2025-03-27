@@ -54,6 +54,12 @@ const About = () => {
             plataforma, você assume o controle, evita surpresas e constrói um
             futuro sólido.
           </p>
+          <p className="flex gap-2">
+            <Check className="h-6 w-6 flex-shrink-0 text-primary" />
+            Agora você pode inclusive lançar suas movimentações de compra e
+            venda de criptomoedas e acompanhar seu lucro atual em tempo real.
+          </p>
+
           <div className="flex w-full items-center justify-center">
             <a
               href="https://planejeja.com.br/"

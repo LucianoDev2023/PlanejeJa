@@ -76,7 +76,7 @@ const LandingPage = () => {
             Experimente grátis
           </a>
         </div>
-        <p className="text-xs text-gray-400"> Versão 1.4.0 ©2024</p>
+        <p className="text-xs text-gray-400"> Versão 1.5.0 ©2025</p>
         <p className="pb-2 text-xs text-gray-400">planejejasuporte@gmail.com</p>
       </div>
 
