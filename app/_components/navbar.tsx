@@ -20,8 +20,8 @@ const Navbar = () => {
   const links = [
     { href: "/", label: "Início" },
     { href: "/transactions", label: "Transações" },
-    { href: "/subscription", label: "Assinatura" },
     { href: "/criptos", label: "Criptos" },
+    { href: "/subscription", label: "Assinatura" },
   ];
 
   const isHome = pathname === "/";
