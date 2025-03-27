@@ -256,9 +256,7 @@ export default function TradeForm({
             className="w-full border border-gray-600 text-xs text-white/70"
           />
           <p className="pt-1 text-xs text-blue-600 md:text-sm">
-            {formData.type === "buy"
-              ? "Preço do Token"
-              : "Preço token na compra"}
+            Preço token na compra
           </p>
         </div>
 
