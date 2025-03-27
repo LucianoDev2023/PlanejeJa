@@ -21,7 +21,10 @@ export default function TransactionContainer() {
       } catch (error) {
         console.error("Erro ao buscar transações:", error);
       } finally {
-        setLoading(false);
+        // Aguarda 2 segundos antes de finalizar o carregamento
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       }
     };
 

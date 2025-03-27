@@ -70,7 +70,7 @@ export default function TransactionCard({
           <div className="grid w-full grid-cols-1 items-center justify-center text-left md:grid-cols-7">
             <p className="col-span-1 break-words text-xs font-semibold">
               {transaction.token} -{" "}
-              {transaction.type === "buy" ? "🟢 Compra" : "🔴 Venda"}
+              {transaction.type === "buy" ? "🛒 Compra" : "💰 Venda"}
             </p>
 
             <p className="col-span-1 break-words text-xs">
