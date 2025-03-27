@@ -12,7 +12,7 @@
 // };
 
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 // Criando um middleware customizado que inclui o Clerk e o tratamento do webhook
 const customMiddleware = clerkMiddleware((auth, req) => {
