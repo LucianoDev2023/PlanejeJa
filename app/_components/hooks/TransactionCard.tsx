@@ -111,7 +111,7 @@ export default function TransactionCard({
 
             {transaction.type === "buy" && (
               <p className="col-span-1 break-words text-xs">
-                <strong>Preço Atual:</strong> ${priceNow.toFixed(2)}
+                <strong>Preço Atual:</strong> ${priceNow.toFixed(4)}
               </p>
             )}
 
