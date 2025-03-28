@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { tokens } from "@/app/_components/data/binanceToken";
 import { NextResponse } from "next/server";
 
@@ -11,7 +9,7 @@ export async function GET() {
       tokens.map((token) =>
         fetch(
           `https://api.binance.com/api/v3/ticker/price?symbol=${token}USDT`,
-          { cache: "no-store" },
+          // cache padrão: force-cache (sem opções aqui)
         )
           .then((res) => res.json())
           .then((data) => ({ token, data })),
