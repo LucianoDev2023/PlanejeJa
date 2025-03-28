@@ -1,6 +1,8 @@
 import { tokens } from "@/app/_components/data/binanceToken";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const prices: { [key: string]: string } = {};
