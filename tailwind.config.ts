@@ -1,25 +1,24 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   safelist: [
     "sm:m-1",
     "sm:space-y-1",
-    "sm:w-1/2", // Adicione as classes sm: que você está usando
-    // ...outras classes que precisam ser preservadas
+    "sm:w-1/2",
+    // Adicione outras classes que precisam ser preservadas
   ],
-  darkMode: "class", // Corrigido para "class" ao invés de array
   content: [
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Inter"', "sans-serif"], // Corrigido as aspas duplas no nome da fonte
+        sans: ['"Inter"', "sans-serif"],
       },
       colors: {
-        danger: "#F6352E",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -53,6 +52,7 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        danger: "#F6352E",
         chart: {
           "1": "hsl(var(--chart-1))",
           "2": "hsl(var(--chart-2))",
@@ -73,24 +73,27 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "accordion-down": {
-          from: {
-            height: "0",
+        "pulse-border": {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "1",
           },
-          to: {
-            height: "var(--radix-accordion-content-height)",
+          "100%": {
+            transform: "scale(1.8)",
+            opacity: "0",
           },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
+        "pulse-border": "pulse-border 2s ease-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

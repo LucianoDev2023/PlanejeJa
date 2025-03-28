@@ -22,6 +22,7 @@ interface SummaryCards {
   min_Year: string;
   max_Year: string;
   option: string;
+  className?: string;
 }
 
 const SummaryCards = async ({
@@ -36,6 +37,7 @@ const SummaryCards = async ({
   min_Year,
   max_Year,
   option,
+  className,
 
   // userCanAddTransaction,
 }: SummaryCards) => {
@@ -70,6 +72,7 @@ const SummaryCards = async ({
           <CardHeader className="m-0 flex h-full w-full p-0">
             <CardContent className="flex h-full w-full flex-col items-center justify-center gap-4 p-2">
               <DialogoSeletor
+                className="joyride-periodo"
                 assinatura={hasPremiumPlan}
                 hasCanceledPlan={hasCanceledPlan}
               />
@@ -105,6 +108,7 @@ const SummaryCards = async ({
             title="Renda"
             amount={depositsTotal}
             size="large"
+            classNameCards="joyride-cards"
           />
         </Link>
 

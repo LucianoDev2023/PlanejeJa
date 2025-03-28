@@ -11,11 +11,12 @@ interface SummaryCardProps {
   amount: number;
   size?: "small" | "large";
   userCanAddTransaction?: boolean;
-  className?: string;
+  classNameCards?: string;
 }
 
 const SummaryCard = ({
   icon,
+  classNameCards,
   title,
   amount,
   size = "small",
@@ -28,7 +29,9 @@ const SummaryCard = ({
 
   return (
     <>
-      <Card className="m-0 flex-col items-center justify-center gap-3 bg-gradient-to-b from-[#131d27] to-[#040b11] p-0 sm:flex-row">
+      <Card
+        className={`m-0 flex-col items-center justify-center gap-3 bg-gradient-to-b from-[#131d27] to-[#040b11] p-0 sm:flex-row ${classNameCards}`}
+      >
         <CardHeader
           className={`${
             title === "Saldo" ? "flex-row" : "flex-col"

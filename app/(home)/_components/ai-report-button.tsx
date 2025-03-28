@@ -23,12 +23,14 @@ interface AiReportButtonProps {
   hasPremiumPlan: boolean;
   hasCanceledPlan: boolean;
   month: string;
+  className?: string;
 }
 
 const AiReportButton = ({
   month,
   hasPremiumPlan,
   hasCanceledPlan,
+  className = "",
 }: AiReportButtonProps) => {
   const [report, setReport] = useState<string | null>(null);
   const [reportIsLoading, setReportIsLoading] = useState(false);
@@ -84,7 +86,10 @@ const AiReportButton = ({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="rouded-lg bg-white/20">
+        <Button
+          variant="outline"
+          className={`rounded-lg bg-white/20 font-bold ${className}`}
+        >
           <BotIcon />
           <span className="text-xs sm:block">Relatório</span> IA
         </Button>

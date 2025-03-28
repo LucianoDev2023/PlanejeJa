@@ -13,6 +13,7 @@ import { getDashboardTotal } from "../_data/get-dashboard/index_total";
 import { getYearLimits } from "../_data/get-dashboard/limit_year";
 import AddTransactionButton from "../_components/add-transaction-button";
 import { Card } from "../_components/ui/card";
+import Tour from "./_actions/tour/Tour";
 
 interface HomeProps {
   searchParams: {
@@ -61,7 +62,12 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
 
   return (
     <div className="flex h-full flex-col justify-between">
-      <Navbar />
+      <Navbar
+        inicioClass="joyride-inicio"
+        transacoesClass="joyride-transacoes"
+        criptosClass="joyride-criptos"
+        assinaturaClass="joyride-assinatura"
+      />
       {/* <div className="flex items-center justify-center">
       <AddTransactionButton
         userCanAddTransaction={userCanAddTransaction}
@@ -71,10 +77,12 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
         <div className="flex justify-between p-2">
           <div className="flex w-full items-center justify-between sm:justify-start sm:gap-4">
             <AddTransactionButton
+              className="joyride-add-transaction"
               userCanAddTransaction={userCanAddTransaction}
             />
 
             <AiReportButton
+              className="joyride-ai-report"
               month={month}
               hasPremiumPlan={
                 user?.publicMetadata?.subscriptionPlan === "premium"
@@ -91,6 +99,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
           {/* Coluna 1 */}
           <div className="flex h-full w-full flex-col gap-3 sm:w-1/2">
             <SummaryCards
+              className="joyride-periodo"
               hasPremiumPlan={
                 user.publicMetadata.subscriptionPlan === "premium"
               }
@@ -156,6 +165,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
           </div>
         </div>
       </div>
+      <Tour />
     </div>
   );
 };

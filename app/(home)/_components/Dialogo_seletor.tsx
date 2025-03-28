@@ -22,11 +22,13 @@ import TimeSelectAno from "./time-select-ano";
 interface AssinaturaPremium {
   assinatura: boolean;
   hasCanceledPlan: boolean;
+  className?: string;
 }
 
 const DialogoSeletor: React.FC<AssinaturaPremium> = ({
   assinatura,
   hasCanceledPlan,
+  className = "",
 }) => {
   const [selectedOption, setSelectedOption] = useState("mensal");
   const [open, setOpen] = useState(false);
@@ -60,7 +62,10 @@ const DialogoSeletor: React.FC<AssinaturaPremium> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size={"sm"} className="rounded-lg border bg-[#0D141A]">
+        <Button
+          size={"sm"}
+          className={`rounded-lg border ${className} bg-[#0D141A]`}
+        >
           <span className="font-sans font-normal text-white">Período</span>
         </Button>
       </DialogTrigger>

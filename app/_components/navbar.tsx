@@ -12,16 +12,27 @@ import {
 } from "./ui/dropdown-menu";
 import { Menu } from "lucide-react";
 
-const Navbar = () => {
-  const pathname = usePathname();
+interface NavbarProps {
+  inicioClass?: string;
+  transacoesClass?: string;
+  criptosClass?: string;
+  assinaturaClass?: string;
+}
 
+const Navbar = ({
+  inicioClass = "",
+  transacoesClass = "",
+  criptosClass = "",
+  assinaturaClass = "",
+}: NavbarProps) => {
+  const pathname = usePathname();
   const { signOut } = useAuth();
 
   const links = [
-    { href: "/", label: "Início" },
-    { href: "/transactions", label: "Transações" },
-    { href: "/criptos", label: "Criptos" },
-    { href: "/subscription", label: "Assinatura" },
+    { href: "/", label: "Início", extraClass: inicioClass },
+    { href: "/transactions", label: "Transações", extraClass: transacoesClass },
+    { href: "/criptos", label: "Criptos", extraClass: criptosClass },
+    { href: "/subscription", label: "Assinatura", extraClass: assinaturaClass },
   ];
 
   const isHome = pathname === "/";
@@ -65,11 +76,7 @@ const Navbar = () => {
           <Link
             key={link.href}
             href={link.href}
-            className={
-              pathname === link.href
-                ? "font-bold text-primary"
-                : "text-muted-foreground"
-            }
+            className={` ${pathname === link.href ? "font-bold text-primary" : "text-muted-foreground"} ${link.extraClass} `}
           >
             {link.label}
           </Link>
@@ -84,8 +91,7 @@ const Navbar = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center rounded-lg border-2 bg-gradient-to-b from-[#213243] to-[#040b11] p-1 focus:outline-none">
-              <Menu className="text-gray-400" size={24} />{" "}
-              {/* Ícone de 3 barras do Lucide */}
+              <Menu className="text-gray-400" size={24} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mr-4 w-40 border-2 border-[#213243] bg-gradient-to-t from-[#1a2a3a] to-[#040b11]">
@@ -93,11 +99,7 @@ const Navbar = () => {
               <DropdownMenuItem key={link.href} asChild>
                 <Link
                   href={link.href}
-                  className={
-                    pathname === link.href
-                      ? "font-bold text-primary"
-                      : "text-muted-foreground"
-                  }
+                  className={` ${pathname === link.href ? "font-bold text-primary" : "text-muted-foreground"}`}
                 >
                   {link.label}
                 </Link>
@@ -109,7 +111,7 @@ const Navbar = () => {
             </DropdownMenuItem>
             <DropdownMenuItem className="mt-2 items-center justify-center">
               <p className="text-center text-xs text-white/40">
-                Versão 1.4.0 ©2024
+                Versão 1.5.0 ©2025
               </p>
             </DropdownMenuItem>
           </DropdownMenuContent>

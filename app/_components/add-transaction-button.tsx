@@ -5,12 +5,15 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import UpsertTransactionDialog from "./upsert-transaction-dialog";
 import Link from "next/link";
+
 interface AddTransactionButtonProps {
   userCanAddTransaction?: boolean;
+  className?: string;
 }
 
 const AddTransactionButton = ({
   userCanAddTransaction,
+  className = "",
 }: AddTransactionButtonProps) => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
@@ -18,7 +21,7 @@ const AddTransactionButton = ({
     <>
       {userCanAddTransaction ? (
         <Button
-          className="rounded-lg font-bold"
+          className={`rounded-lg font-bold ${className}`}
           onClick={() => setDialogIsOpen(true)}
           disabled={!userCanAddTransaction}
         >
