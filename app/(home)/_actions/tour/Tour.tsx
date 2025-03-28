@@ -46,12 +46,8 @@ export default function Tour() {
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
-    const hasSeenTour = localStorage.getItem("hasSeenTour");
-
-    if (!hasSeenTour) {
-      setShowTourButton(true);
-      setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
-    }
+    setShowTourButton(true);
+    setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
   }, []);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
@@ -59,8 +55,7 @@ export default function Tour() {
 
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
-      localStorage.setItem("hasSeenTour", "true"); // Marca como já visto
-      setShowTourButton(false); // Esconde o botão
+      setShowTourButton(false);
     }
   };
 
@@ -72,7 +67,7 @@ export default function Tour() {
         onClick={() => setRun(true)}
         className="relative z-50 rounded-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
       >
-        <span className="animate-pulse-border absolute -inset-1 z-[-1] rounded-full border-2 border-blue-400"></span>
+        <span className="absolute -inset-1 z-[-1] animate-pulse-border rounded-full border-2 border-blue-400"></span>
         Começar Tour
       </button>
 
