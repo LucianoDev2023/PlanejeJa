@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { tokens } from "@/app/_components/data/binanceToken";
 import { NextResponse } from "next/server";
 
