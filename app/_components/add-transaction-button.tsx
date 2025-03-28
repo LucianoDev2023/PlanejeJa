@@ -8,12 +8,12 @@ import Link from "next/link";
 
 interface AddTransactionButtonProps {
   userCanAddTransaction?: boolean;
-  className?: string;
+  // className?: string;
 }
 
 const AddTransactionButton = ({
   userCanAddTransaction,
-  className = "",
+  // className = "",
 }: AddTransactionButtonProps) => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
@@ -21,7 +21,7 @@ const AddTransactionButton = ({
     <>
       {userCanAddTransaction ? (
         <Button
-          className={`rounded-lg font-bold ${className}`}
+          className={`rounded-lg font-bold`}
           onClick={() => setDialogIsOpen(true)}
           disabled={!userCanAddTransaction}
         >

@@ -62,10 +62,10 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
   return (
     <div className="flex h-full flex-col justify-between">
       <Navbar
-        inicioClass="joyride-inicio"
-        transacoesClass="joyride-transacoes"
-        criptosClass="joyride-criptos"
-        assinaturaClass="joyride-assinatura"
+      // inicioClass="joyride-inicio"
+      // transacoesClass="joyride-transacoes"
+      // criptosClass="joyride-criptos"
+      // assinaturaClass="joyride-assinatura"
       />
       {/* <div className="flex items-center justify-center">
       <AddTransactionButton
@@ -76,12 +76,12 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
         <div className="flex justify-between p-2">
           <div className="flex w-full items-center justify-between sm:justify-start sm:gap-4">
             <AddTransactionButton
-              className="joyride-add-transaction"
+              // className="joyride-add-transaction"
               userCanAddTransaction={userCanAddTransaction}
             />
 
             <AiReportButton
-              className="joyride-ai-report"
+              // className="joyride-ai-report"
               month={month}
               hasPremiumPlan={
                 user?.publicMetadata?.subscriptionPlan === "premium"

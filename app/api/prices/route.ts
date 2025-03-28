@@ -9,6 +9,7 @@ export async function GET() {
       tokens.map((token) =>
         fetch(
           `https://api.binance.com/api/v3/ticker/price?symbol=${token}USDT`,
+          { cache: "no-store" },
           // cache padrão: force-cache (sem opções aqui)
         )
           .then((res) => res.json())
