@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Joyride, { Step, CallBackProps, STATUS } from "react-joyride";
+import CustomTooltip from "./components/CustomTooltip";
 
 const allSteps: Step[] = [
   {
@@ -84,14 +85,10 @@ export default function Tour() {
         showProgress
         showSkipButton
         callback={handleJoyrideCallback}
+        tooltipComponent={(props) => (
+          <CustomTooltip {...props} totalSteps={steps.length} />
+        )}
         styles={{ options: { zIndex: 9999 } }}
-        locale={{
-          back: "Voltar",
-          close: "Fechar",
-          last: "Concluir",
-          next: "Próximo",
-          skip: "Pular",
-        }}
       />
     </>
   );
