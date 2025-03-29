@@ -4,6 +4,7 @@ import { LogInIcon } from "lucide-react";
 import { SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import ResetTourFlag from "../(home)/_actions/tour/ResetTourFlag";
 
 const LoginPage = async () => {
   const { userId } = await auth();
@@ -12,6 +13,7 @@ const LoginPage = async () => {
   }
   return (
     <>
+      <ResetTourFlag />
       <div className="flex flex-col">
         <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-[#03090f] to-[#386289] p-4 sm:flex-row sm:p-8">
           {/* Divisão em duas colunas: uma para o card e a outra para a imagem */}

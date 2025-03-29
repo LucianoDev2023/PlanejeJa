@@ -46,8 +46,12 @@ export default function Tour() {
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
-    setShowTourButton(true);
-    setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
+    const hasSeenTour = localStorage.getItem("hasSeenTour");
+
+    if (!hasSeenTour) {
+      setShowTourButton(true);
+      setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
+    }
   }, []);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
@@ -56,6 +60,7 @@ export default function Tour() {
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
       setShowTourButton(false);
+      localStorage.setItem("hasSeenTour", "true");
     }
   };
 
@@ -86,7 +91,6 @@ export default function Tour() {
           last: "Concluir",
           next: "Próximo",
           skip: "Pular",
-          nextLabelWithProgress: " (Etapa {step} de {steps})",
         }}
       />
     </>
