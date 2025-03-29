@@ -26,7 +26,7 @@ interface HomeProps {
 const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
   const { userId } = await auth();
   if (!userId) {
-    redirect("/login");
+    redirect("/login?resetTour=true");
   }
 
   await clerkClient().users.getUser(userId);

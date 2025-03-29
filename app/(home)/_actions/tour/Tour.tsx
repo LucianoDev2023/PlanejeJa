@@ -46,12 +46,16 @@ export default function Tour() {
   const [showTourButton, setShowTourButton] = useState(false);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    const hasSeenTour = localStorage.getItem("hasSeenTour");
+    console.log("🚀 Tour montado");
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth < 768;
+      const hasSeenTour = localStorage.getItem("hasSeenTour");
 
-    if (!hasSeenTour) {
-      setShowTourButton(true);
-      setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
+      // Tour só aparece se ainda não foi visto
+      if (hasSeenTour !== "true") {
+        setShowTourButton(true);
+        setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
+      }
     }
   }, []);
 
@@ -61,7 +65,10 @@ export default function Tour() {
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
       setShowTourButton(false);
+
+      // 🔒 Marca como já visto no localStorage
       localStorage.setItem("hasSeenTour", "true");
+      console.log("✅ Tour finalizado ou pulado. Flag salva.");
     }
   };
 

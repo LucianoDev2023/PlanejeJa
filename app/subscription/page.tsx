@@ -12,9 +12,11 @@ import ContactForm from "./_components/ContactForm";
 
 const SubscriptionPage = async () => {
   const { userId } = await auth();
+
   if (!userId) {
-    redirect("/login");
+    redirect("/login?resetTour=true");
   }
+
   const user = await clerkClient().users.getUser(userId);
   const email = user.emailAddresses[0].emailAddress;
   const firstName = user.firstName;

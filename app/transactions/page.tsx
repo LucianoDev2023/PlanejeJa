@@ -22,7 +22,7 @@ const TransactionsPage = async ({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/login");
+    redirect("/login?resetTour=true");
   }
   await clerkClient().users.getUser(userId);
   const user = await clerkClient().users.getUser(userId);
