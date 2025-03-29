@@ -8,7 +8,7 @@ const allSteps: Step[] = [
   {
     target: ".joyride-add-transaction",
     content: `Clique aqui para adicionar uma nova transação. \n
-      Limite de 10 transações por mês no Plano Básico e ilimitado no Plano Premium.`,
+      Limite de 10 transações por mês no Plano Básico e ilimitado para o Plano Premium.`,
   },
   {
     target: ".joyride-ai-report",
@@ -18,7 +18,7 @@ const allSteps: Step[] = [
   {
     target: ".joyride-periodo",
     content: `Selecione o período que deseja exibir suas transações.
-              Para o Plano Básico apresenta apenas as transações do mês atual.`,
+              Para o Plano Básico, apresenta apenas as transações do mês atual.`,
   },
   {
     target: ".joyride-cards",
