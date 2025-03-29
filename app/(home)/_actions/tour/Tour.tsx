@@ -86,7 +86,7 @@ export default function Tour() {
           last: "Concluir",
           next: "Próximo",
           skip: "Pular",
-          // nextLabelWithProgress: " (Etapa {step} de {steps})",
+          nextLabelWithProgress: " (Etapa {step} de {steps})",
         }}
       />
     </>
