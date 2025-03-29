@@ -7,15 +7,18 @@ import CustomTooltip from "./components/CustomTooltip";
 const allSteps: Step[] = [
   {
     target: ".joyride-add-transaction",
-    content: "Clique aqui para adicionar uma nova transação.",
+    content: `Clique aqui para adicionar uma nova transação. \n
+      Limite de 10 transações por mês no Plano Básico e ilimitado no Plano Premium.`,
   },
   {
     target: ".joyride-ai-report",
-    content: "Gere um relatório inteligente com IA aqui.",
+    content:
+      "Gere um relatório inteligente com IA aqui. Disponível apenas no Plano Premium.",
   },
   {
     target: ".joyride-periodo",
-    content: "Selecione o período que deseja exibir suas transações",
+    content: `Selecione o período que deseja exibir suas transações.
+              Para o Plano Básico apresenta apenas as transações do mês atual.`,
   },
   {
     target: ".joyride-cards",
@@ -32,11 +35,12 @@ const allSteps: Step[] = [
   },
   {
     target: ".joyride-criptos",
-    content: "Gerencie seus investimentos em criptomoedas.",
+    content:
+      "Gerencie seus investimentos em criptomoedas, acompanhe valores em tempo real, lucro nas operações de compra e muito mais.",
   },
   {
     target: ".joyride-assinatura",
-    content: "Aqui você pode atualizar seu plano ou ver o status.",
+    content: "Aqui você pode atualizar seu plano ou ver o status da conta.",
   },
 ].map((step) => ({ ...step, placement: "bottom" }));
 
@@ -78,9 +82,9 @@ export default function Tour() {
     <>
       <button
         onClick={() => setRun(true)}
-        className="relative z-50 rounded-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
+        className="relative z-50 rounded-t-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
       >
-        <span className="absolute -inset-1 z-[-1] animate-pulse-border rounded-full border-2 border-blue-400"></span>
+        <span className="absolute -inset-1 z-[-1] animate-pulse-border border-2 border-[#68aaff]"></span>
         Começar Tour
       </button>
 
