@@ -8,11 +8,12 @@ const tradeFormSteps: Step[] = [
   {
     target: ".joyride-token",
     content:
-      "Selecione o token da criptomoeda que deseja registrar. O preço atual é atualizado a cada 3 segundos sempre considerando o par do token + USDT",
+      "Selecione o token da criptomoeda que deseja registrar. O preço atual é atualizado a cada 3 segundos, sempre considerando o par do token + USDT.",
   },
   {
     target: ".joyride-type",
-    content: "Escolha se é uma operação de compra ou venda.",
+    content:
+      "Escolha se é uma operação de compra ou venda. Se for venda, será necessário indicar o valor do token no momento da venda.",
   },
   {
     target: ".joyride-usd-value",
@@ -43,7 +44,7 @@ export default function TradeFormTour() {
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("hasSeenTradeFormTour");
-    if (hasSeenTour !== "true") {
+    if (hasSeenTour !== "false") {
       setSteps(tradeFormSteps);
       setShowTourButton(true);
     }
