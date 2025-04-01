@@ -18,7 +18,7 @@ export default function TransactionFilterToggle({
   onChange,
 }: TransactionFilterToggleProps) {
   return (
-    <div className="relative mx-2 my-2 flex w-fit items-center justify-center rounded-lg bg-gray-900 p-[2px]">
+    <div className="relative mx-2 my-2 flex w-fit items-center justify-center rounded-lg bg-gray-900 p-[2px] px-1 py-0.5">
       {filters.map((filter) => {
         const isActive = filter.value === value;
         return (
