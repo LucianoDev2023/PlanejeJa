@@ -170,7 +170,7 @@ export default function TradeForm({
   };
 
   return (
-    <div className="w-full border-b border-gray-800 bg-[#060D13] p-4 shadow-md">
+    <div className="w-full border-b border-gray-800 bg-[#060D13] p-2 px-4 shadow-md">
       <p className="pb-3 text-center font-sans text-sm font-normal text-gray-300 sm:m-0 sm:mb-2 sm:mt-2 sm:pl-2 sm:text-base">
         Faça o registro de compra ou venda
       </p>
@@ -185,7 +185,7 @@ export default function TradeForm({
           >
             <SelectTrigger
               disabled={isSubmitting}
-              className="w-full border border-gray-600 text-xs text-white/70"
+              className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
             >
               <SelectValue placeholder="Selecione um Token" />
             </SelectTrigger>
@@ -197,7 +197,7 @@ export default function TradeForm({
               ))}
             </SelectContent>
           </Select>
-          <p className="pt-1 text-xs text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-600 sm:text-xs">
             {tokenPrices[selectedToken]
               ? `Preço Atual: $${tokenPrices[selectedToken]}`
               : "Carregando..."}
@@ -215,7 +215,7 @@ export default function TradeForm({
               }))
             }
           >
-            <SelectTrigger className="w-full border border-gray-600 text-white/70">
+            <SelectTrigger className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
@@ -223,7 +223,7 @@ export default function TradeForm({
               <SelectItem value="sell">Venda</SelectItem>
             </SelectContent>
           </Select>
-          <p className="pt-1 text-xs text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
             Tipo de operação
           </p>
         </div>
@@ -236,9 +236,9 @@ export default function TradeForm({
             onChange={(e) => handleInputChange(e, "usdValue")}
             placeholder="$ USD"
             required
-            className="w-full border border-gray-600 text-xs text-white/70"
+            className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
           />
-          <p className="pt-1 text-xs text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
             {formData.type === "buy"
               ? "Total do investimento"
               : "Total para venda"}
@@ -253,9 +253,9 @@ export default function TradeForm({
             onChange={(e) => handleInputChange(e, "price")}
             placeholder="$ USD"
             required
-            className="w-full border border-gray-600 text-xs text-white/70"
+            className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
           />
-          <p className="pt-1 text-xs text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
             Preço token na compra
           </p>
         </div>
@@ -268,25 +268,27 @@ export default function TradeForm({
               value={formData.sellTokenPrice}
               onChange={(e) => handleInputChange(e, "sellTokenPrice")}
               placeholder="$ USD"
-              className="w-full border border-gray-600 text-xs text-white/70"
+              className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
             />
-            <p className="pt-1 text-xs text-blue-600 md:text-sm">
+            <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
               Preço token na venda
             </p>
           </div>
         )}
 
         <div className="flex flex-col">
-          <div className="flex h-fit w-full items-center justify-center rounded-lg border border-gray-600 p-2 text-xs text-gray-400 sm:text-sm">
+          <div className="flex h-7 w-full items-center justify-center rounded-lg border border-gray-600 text-[10px] text-gray-400 sm:text-xs">
             {formData.amount ? `0 ${formData.amount}` : "0"}
           </div>
-          <p className="pt-1 text-xs text-blue-600 md:text-sm">Quantidade</p>
+          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
+            Quantidade
+          </p>
         </div>
 
         <div className="flex w-full items-start justify-start">
-          <Button
+          <button
             type="submit"
-            className="flex w-fit items-center justify-center gap-2 bg-[#56B22E] hover:bg-[#4B9C28]"
+            className="flex h-7 w-full items-center justify-center gap-2 rounded-md bg-[#3f8221] px-1 text-[10px] text-white hover:bg-[#4B9C28]"
             disabled={isSubmitting}
           >
             {isSubmitting && (
@@ -297,7 +299,7 @@ export default function TradeForm({
               : formData.id
                 ? "Salvar alterações"
                 : "Registrar"}
-          </Button>
+          </button>
         </div>
       </form>
     </div>

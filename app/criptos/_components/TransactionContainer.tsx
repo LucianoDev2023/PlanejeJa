@@ -9,7 +9,7 @@ export default function TransactionContainer() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [tokenPrices, setTokenPrices] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
-
+  const PRICE_UPDATE_INTERVAL = 3000;
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -50,7 +50,7 @@ export default function TransactionContainer() {
     };
 
     fetchTokenPrices();
-    const interval = setInterval(fetchTokenPrices, 10000);
+    const interval = setInterval(fetchTokenPrices, PRICE_UPDATE_INTERVAL);
 
     return () => {
       isMounted = false;

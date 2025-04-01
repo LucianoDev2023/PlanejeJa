@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Transaction } from "./TradeForm";
 import TransactionCard from "./TransactionCard";
 import TradeForm from "./TradeForm";
+import TransactionFilterToggle from "@/app/criptos/_components/TransactionFilterToggle";
 
 interface TransactionListProps {
   tokenPrices: { [key: string]: string };
@@ -25,6 +26,13 @@ export default function TransactionList({
   const [selectedToken, setSelectedToken] = useState<string>(
     tokens?.[0] || "BTC",
   );
+
+  const [filter, setFilter] = useState<"all" | "buy" | "sell">("all");
+
+  const filteredTransactions =
+    filter === "all"
+      ? transactions
+      : transactions.filter((t) => t.type === filter);
 
   const handleDelete = async (id: string) => {
     try {
@@ -61,8 +69,8 @@ export default function TransactionList({
   const clearEditing = () => setTransactionBeingEdited(null);
 
   return (
-    <div className="flex w-full flex-col gap-1">
-      <div className="sticky top-0 z-10 bg-[#060D13]">
+    <div className="flex w-full flex-col">
+      <div className="bg-[#060D13]">
         <TradeForm
           onAddTransaction={(newTransaction) =>
             setTransactions((prev) => [...prev, newTransaction])
@@ -77,6 +85,11 @@ export default function TransactionList({
         />
       </div>
 
+      {/* Apenas o filtro será fixo no topo */}
+      <div className="sticky top-0 z-10 border-b border-gray-800 bg-[#060D13]">
+        <TransactionFilterToggle value={filter} onChange={setFilter} />
+      </div>
+
       {loading ? (
         Array.from({ length: 4 }).map((_, i) => (
           <div
@@ -87,7 +100,7 @@ export default function TransactionList({
       ) : transactions.length === 0 ? (
         <p className="pl-4 text-gray-400">Nenhuma transação encontrada.</p>
       ) : (
-        transactions.map((transaction) => (
+        filteredTransactions.map((transaction) => (
           <TransactionCard
             key={transaction.id}
             transaction={transaction}

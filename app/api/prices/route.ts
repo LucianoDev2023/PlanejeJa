@@ -5,37 +5,28 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const prices: { [key: string]: string } = {};
-
-    const responses = await Promise.allSettled(
-      tokens.map((token) =>
-        fetch(
-          `https://api.binance.com/api/v3/ticker/price?symbol=${token}USDT`,
-          { cache: "no-store" },
-          // cache padrão: force-cache (sem opções aqui)
-        )
-          .then((res) => res.json())
-          .then((data) => ({ token, data })),
-      ),
+    const response = await fetch(
+      "https://api.binance.com/api/v3/ticker/price",
+      {
+        cache: "no-store",
+      },
     );
 
-    responses.forEach((result) => {
-      if (result.status === "fulfilled") {
-        const { token, data } = result.value;
+    const data = await response.json();
 
-        if (data && typeof data.price === "string") {
-          prices[token] = parseFloat(data.price).toFixed(2);
-        } else {
-          console.warn(`⚠️ Resposta inválida para ${token}:`, data);
-        }
-      } else {
-        console.error(`❌ Erro ao buscar preço para token:`, result.reason);
+    const prices: { [key: string]: string } = {};
+
+    data.forEach((item: { symbol: string; price: string }) => {
+      // Ex: BTCUSDT => BTC
+      const match = tokens.find((token) => item.symbol === `${token}USDT`);
+      if (match) {
+        prices[match] = parseFloat(item.price).toFixed(2);
       }
     });
 
     return NextResponse.json(prices, { status: 200 });
   } catch (error) {
-    console.error("❌ Erro geral ao buscar preços dos tokens Binance:", error);
+    console.error("❌ Erro ao buscar preços dos tokens Binance:", error);
     return NextResponse.json(
       { error: "Erro ao buscar preços" },
       { status: 500 },
