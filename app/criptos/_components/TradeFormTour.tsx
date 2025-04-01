@@ -7,7 +7,8 @@ import Joyride, { Step, CallBackProps, STATUS } from "react-joyride";
 const tradeFormSteps: Step[] = [
   {
     target: ".joyride-token",
-    content: "Selecione o token da criptomoeda que deseja registrar.",
+    content:
+      "Selecione o token da criptomoeda que deseja registrar. O preço atual é atualizado a cada 3 segundos sempre considerando o par do token + USDT",
   },
   {
     target: ".joyride-type",
@@ -63,10 +64,10 @@ export default function TradeFormTour() {
     <>
       <button
         onClick={() => setRun(true)}
-        className="relative z-50 rounded-t-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
+        className="relative z-50 w-full rounded-t-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
       >
         <span className="absolute -inset-1 z-[-1] animate-pulse-border border-2 border-[#68aaff]"></span>
-        Começar Tour Formuálio
+        Começar tour formuário criptos
       </button>
 
       <Joyride
