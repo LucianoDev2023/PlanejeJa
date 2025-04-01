@@ -44,7 +44,7 @@ export default function TradeFormTour() {
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("hasSeenTradeFormTour");
-    if (hasSeenTour !== "false") {
+    if (hasSeenTour !== "true") {
       setSteps(tradeFormSteps);
       setShowTourButton(true);
     }
