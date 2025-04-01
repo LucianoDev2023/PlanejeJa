@@ -5,6 +5,7 @@ import { Transaction } from "./TradeForm";
 import TransactionCard from "./TransactionCard";
 import TradeForm from "./TradeForm";
 import TransactionFilterToggle from "@/app/criptos/_components/TransactionFilterToggle";
+import TradeFormTour from "@/app/criptos/_components/TradeFormTour";
 
 interface TransactionListProps {
   tokenPrices: { [key: string]: string };
@@ -110,6 +111,9 @@ export default function TransactionList({
           />
         ))
       )}
+      <div className="fixed bottom-4 right-4 z-50 hidden sm:block">
+        <TradeFormTour />
+      </div>
     </div>
   );
 }

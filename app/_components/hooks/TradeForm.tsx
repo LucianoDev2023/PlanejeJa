@@ -56,7 +56,6 @@ export default function TradeForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Resetar o formulário quando a transação em edição mudar ou for removida
   useEffect(() => {
     if (transactionBeingEdited) {
       setFormData(transactionBeingEdited);
@@ -74,7 +73,6 @@ export default function TradeForm({
     }
   }, [transactionBeingEdited, selectedToken]);
 
-  // Atualizar automaticamente quantidade
   useEffect(() => {
     if (formData.usdValue && formData.price) {
       const calculatedAmount = (
@@ -178,7 +176,7 @@ export default function TradeForm({
         onSubmit={handleSubmit}
         className="grid w-full grid-cols-4 gap-2 sm:gap-4 md:grid-cols-7"
       >
-        <div className="flex flex-col">
+        <div className="joyride-token flex flex-col">
           <Select
             onValueChange={(value) => setSelectedToken(value)}
             value={selectedToken}
@@ -204,7 +202,7 @@ export default function TradeForm({
           </p>
         </div>
 
-        <div className="flex flex-col">
+        <div className="joyride-type flex flex-col">
           <Select
             disabled={isSubmitting}
             value={formData.type}
@@ -228,7 +226,7 @@ export default function TradeForm({
           </p>
         </div>
 
-        <div className="flex flex-col">
+        <div className="joyride-usd-value flex flex-col">
           <Input
             disabled={isSubmitting}
             type="number"
@@ -245,7 +243,7 @@ export default function TradeForm({
           </p>
         </div>
 
-        <div className="flex flex-col">
+        <div className="joyride-price flex flex-col">
           <Input
             disabled={isSubmitting}
             type="number"
@@ -261,7 +259,7 @@ export default function TradeForm({
         </div>
 
         {formData.type === "sell" && (
-          <div className="flex flex-col">
+          <div className="joyride-sell-price flex flex-col">
             <Input
               disabled={isSubmitting}
               type="number"
@@ -276,7 +274,7 @@ export default function TradeForm({
           </div>
         )}
 
-        <div className="flex flex-col">
+        <div className="joyride-amount flex flex-col">
           <div className="flex h-7 w-full items-center justify-center rounded-lg border border-gray-600 text-[10px] text-gray-400 sm:text-xs">
             {formData.amount ? `0 ${formData.amount}` : "0"}
           </div>
@@ -285,7 +283,7 @@ export default function TradeForm({
           </p>
         </div>
 
-        <div className="flex w-full items-start justify-start">
+        <div className="joyride-submit flex w-full items-start justify-start">
           <button
             type="submit"
             className="flex h-7 w-full items-center justify-center gap-2 rounded-md bg-[#3f8221] px-1 text-[10px] text-white hover:bg-[#4B9C28]"
