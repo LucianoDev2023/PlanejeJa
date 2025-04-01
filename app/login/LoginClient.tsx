@@ -9,6 +9,8 @@ import Image from "next/image";
 export default function LoginClient() {
   useEffect(() => {
     localStorage.setItem("hasSeenTour", "false");
+    localStorage.setItem("hasSeenTradeFormTour", "false");
+
     console.log("🔁 Tour resetado ao abrir a tela de login");
   }, []);
 
