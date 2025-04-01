@@ -63,6 +63,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
   return (
     <div className="flex h-full flex-col justify-between">
       <Navbar
+        logoClass="joyride-logo"
         inicioClass="joyride-inicio"
         transacoesClass="joyride-transacoes"
         criptosClass="joyride-criptos"

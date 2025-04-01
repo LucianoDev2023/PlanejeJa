@@ -13,6 +13,7 @@ import {
 import { Menu } from "lucide-react";
 
 interface NavbarProps {
+  logoClass?: string;
   inicioClass?: string;
   transacoesClass?: string;
   criptosClass?: string;
@@ -20,6 +21,7 @@ interface NavbarProps {
 }
 
 const Navbar = ({
+  logoClass = "",
   inicioClass = "",
   transacoesClass = "",
   criptosClass = "",
@@ -42,7 +44,9 @@ const Navbar = ({
       {/* LOGO */}
       <div className="flex items-center">
         {isHome ? (
-          <div className="flex items-center justify-center gap-2 text-white/90 sm:text-white/70">
+          <div
+            className={`flex items-center justify-center gap-2 text-white/90 sm:text-white/70 ${logoClass}`}
+          >
             <Image
               src="/New11.png"
               alt="Planeje Já"
@@ -54,7 +58,9 @@ const Navbar = ({
           </div>
         ) : (
           <Link href="/">
-            <div className="flex items-center justify-center gap-2 text-white/90 sm:text-white/70">
+            <div
+              className={`flex items-center justify-center gap-2 text-white/90 sm:text-white/70 ${logoClass}`}
+            >
               <Image
                 src="/New11.png"
                 alt="Planeje Já"

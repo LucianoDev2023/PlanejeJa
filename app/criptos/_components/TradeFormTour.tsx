@@ -35,6 +35,10 @@ const tradeFormSteps: Step[] = [
     target: ".joyride-submit",
     content: "Clique para registrar ou salvar a transação.",
   },
+  {
+    target: ".joyride-lucro",
+    content: "O valor e porcentagem do lucro é atualizado a cada 3 segundos.",
+  },
 ].map((step) => ({ ...step, placement: "bottom" }));
 
 export default function TradeFormTour() {

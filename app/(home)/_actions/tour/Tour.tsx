@@ -6,6 +6,10 @@ import CustomTooltip from "./components/CustomTooltip";
 
 const allSteps: Step[] = [
   {
+    target: ".joyride-logo",
+    content: `Clique na logo para retornar à página inicial.`,
+  },
+  {
     target: ".joyride-add-transaction",
     content: `Clique aqui para adicionar uma nova transação. \n
       Limite de 10 transações por mês no Plano Básico e ilimitado para o Plano Premium.`,
