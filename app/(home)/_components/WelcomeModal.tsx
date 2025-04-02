@@ -7,7 +7,7 @@ export default function WelcomeModal() {
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem("hasSeenWelcomeModal");
-    if (!hasSeenWelcome) {
+    if (hasSeenWelcome !== "true") {
       setShowModal(true);
     }
   }, []);

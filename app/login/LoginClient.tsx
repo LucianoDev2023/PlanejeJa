@@ -8,9 +8,9 @@ import Image from "next/image";
 
 export default function LoginClient() {
   useEffect(() => {
+    localStorage.setItem("hasSeenWelcomeModal", "false");
     localStorage.setItem("hasSeenTour", "false");
     localStorage.setItem("hasSeenTradeFormTour", "false");
-    localStorage.setItem("hasSeenWelcomeModal", "false");
 
     console.log("🔁 Tour resetado ao abrir a tela de login");
   }, []);
