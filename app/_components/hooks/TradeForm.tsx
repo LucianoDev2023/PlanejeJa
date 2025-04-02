@@ -276,7 +276,7 @@ export default function TradeForm({
 
         <div className="joyride-amount flex flex-col">
           <div className="flex h-7 w-full items-center justify-center rounded-lg border border-gray-600 text-[10px] text-gray-400 sm:text-xs">
-            {formData.amount ? `0 ${formData.amount}` : "0"}
+            {formData.amount ? `${formData.amount}` : "0"}
           </div>
           <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
             Quantidade

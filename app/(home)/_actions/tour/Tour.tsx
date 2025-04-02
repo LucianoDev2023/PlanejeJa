@@ -62,7 +62,7 @@ export default function Tour() {
       // Tour só aparece se ainda não foi visto
       if (hasSeenTour !== "true") {
         setShowTourButton(true);
-        setSteps(isMobile ? allSteps.slice(0, 4) : allSteps);
+        setSteps(isMobile ? allSteps.slice(0, 5) : allSteps);
       }
     }
   }, []);
@@ -86,10 +86,10 @@ export default function Tour() {
     <>
       <button
         onClick={() => setRun(true)}
-        className="relative z-50 rounded-t-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
+        className="relative z-40 rounded-t-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
       >
         <span className="absolute -inset-1 z-[-1] animate-pulse-border border-2 border-[#68aaff]"></span>
-        Começar tour janela principal
+        Conheça a janela principal
       </button>
 
       <Joyride

@@ -14,6 +14,7 @@ import { getYearLimits } from "../_data/get-dashboard/limit_year";
 import AddTransactionButton from "../_components/add-transaction-button";
 import { Card } from "../_components/ui/card";
 import Tour from "./_actions/tour/Tour";
+import WelcomeModal from "./_components/WelcomeModal";
 
 interface HomeProps {
   searchParams: {
@@ -62,6 +63,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
 
   return (
     <div className="flex h-full flex-col justify-between">
+      <WelcomeModal />
       <Navbar
         logoClass="joyride-logo"
         inicioClass="joyride-inicio"

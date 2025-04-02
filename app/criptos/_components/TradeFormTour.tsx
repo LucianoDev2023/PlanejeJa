@@ -48,7 +48,7 @@ export default function TradeFormTour() {
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("hasSeenTradeFormTour");
-    if (hasSeenTour !== "true") {
+    if (hasSeenTour !== "false") {
       setSteps(tradeFormSteps);
       setShowTourButton(true);
     }
@@ -72,7 +72,7 @@ export default function TradeFormTour() {
         className="relative z-50 w-full rounded-t-lg bg-gradient-to-b from-[#14202c] to-[#68aaff] px-4 py-2 font-sans text-white shadow hover:bg-gradient-to-t"
       >
         <span className="absolute -inset-1 z-[-1] animate-pulse-border border-2 border-[#68aaff]"></span>
-        Começar tour formuário criptos
+        Conheça as funcionalidades do formulário
       </button>
 
       <Joyride
