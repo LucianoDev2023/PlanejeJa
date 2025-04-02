@@ -6,6 +6,7 @@ import About from "./_components/about";
 import Hero from "./_components/hero";
 import Image from "next/image";
 import NavStart from "./_components/navstart";
+import WelcomeModal from "../(home)/_components/WelcomeModal";
 
 // Declarando a função gtag_report_conversion para evitar o erro no TypeScript
 declare global {
@@ -36,6 +37,7 @@ const LandingPage = () => {
   return (
     <main className="flex flex-col overflow-auto bg-gradient-to-t from-[#5c7a95] to-[#040b11]">
       <div className="mt-10">
+        <WelcomeModal />
         <NavStart />
       </div>
 
