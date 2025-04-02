@@ -10,6 +10,7 @@ export default function LoginClient() {
   useEffect(() => {
     localStorage.setItem("hasSeenTour", "false");
     localStorage.setItem("hasSeenTradeFormTour", "false");
+    localStorage.setItem("hasSeenWelcomeModal", "false");
 
     console.log("🔁 Tour resetado ao abrir a tela de login");
   }, []);

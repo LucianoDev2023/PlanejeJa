@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 export default function WelcomeModal() {
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem("hasSeenWelcomeModal");
