@@ -16,11 +16,16 @@ export async function GET() {
 
     const prices: { [key: string]: string } = {};
 
+    function formatPrice(price: string | number): string {
+      const num = Number(price);
+      return Number.isInteger(num) ? num.toFixed(2) : num.toString();
+    }
+
     data.forEach((item: { symbol: string; price: string }) => {
       // Ex: BTCUSDT => BTC
       const match = tokens.find((token) => item.symbol === `${token}USDT`);
       if (match) {
-        prices[match] = parseFloat(item.price).toFixed(6);
+        prices[match] = formatPrice(item.price);
       }
     });
 

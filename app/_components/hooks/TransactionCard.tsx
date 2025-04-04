@@ -96,7 +96,7 @@ export default function TransactionCard({
 
             <p className="col-span-1 break-words text-xs">
               <strong>Qtd. Tokens:</strong>{" "}
-              {Number.isInteger(amount) ? amount.toFixed(0) : amount.toFixed(6)}
+              {Number.isInteger(amount) ? amount.toFixed(0) : amount.toFixed(2)}
             </p>
 
             <p className="col-span-1 break-words text-xs">
