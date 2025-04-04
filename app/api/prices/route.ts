@@ -20,7 +20,7 @@ export async function GET() {
       // Ex: BTCUSDT => BTC
       const match = tokens.find((token) => item.symbol === `${token}USDT`);
       if (match) {
-        prices[match] = parseFloat(item.price).toFixed(2);
+        prices[match] = parseFloat(item.price).toFixed(6);
       }
     });
 

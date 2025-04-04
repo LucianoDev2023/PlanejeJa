@@ -68,7 +68,6 @@ export const tokens = [
   "QNT",
   "RAY",
   "RENDER",
-  "S",
   "SAND",
   "SEI",
   "SHIB",
@@ -93,4 +92,5 @@ export const tokens = [
   "XMR",
   "XTZ",
   "ZEC",
+  "ZRO",
 ];
