@@ -13,6 +13,7 @@ export const tokens = [
   "ALGO",
   "ALICE",
   "ALPHA",
+  "AIXBT",
   "AMP",
   "ANKR",
   "ANT",
@@ -476,4 +477,5 @@ export const tokens = [
   "ZEN",
   "ZIL",
   "ZRX",
+  "ZRO",
 ];
