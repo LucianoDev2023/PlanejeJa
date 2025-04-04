@@ -1,5 +1,7 @@
 import { tokens } from "@/app/_components/data/binanceToken";
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +30,18 @@ export async function GET() {
         prices[match] = formatPrice(item.price);
       }
     });
+    // const availablePairs = data
+    //   .filter((item) => item.symbol.endsWith("USDT"))
+    //   .map((item) => item.symbol.replace("USDT", ""));
+
+    // // Caminho do arquivo (na raiz do projeto ou onde quiser salvar)
+    // const filePath = path.resolve("availableTokens.txt");
+
+    // // Conteúdo que você quer salvar
+    // const content = JSON.stringify(availablePairs, null, 2);
+
+    // // Salva o arquivo
+    // fs.writeFileSync(filePath, content);
 
     return NextResponse.json(prices, { status: 200 });
   } catch (error) {

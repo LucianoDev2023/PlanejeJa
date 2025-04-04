@@ -1,4 +1,4 @@
-export const tokens = [
+[
   "BTC",
   "ETH",
   "BNB",
@@ -566,5 +566,5 @@ export const tokens = [
   "TUT",
   "BROCCOLI714",
   "BANANAS31",
-  "GUN",
-];
+  "GUN"
+]
