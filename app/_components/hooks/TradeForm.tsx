@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 
 interface TradeFormProps {
   onAddTransaction: (transaction: Transaction) => void;
@@ -177,24 +176,22 @@ export default function TradeForm({
         className="grid w-full grid-cols-4 gap-2 sm:gap-4 md:grid-cols-7"
       >
         <div className="joyride-token flex flex-col">
-          <Select
-            onValueChange={(value) => setSelectedToken(value)}
-            value={selectedToken}
-          >
-            <SelectTrigger
+          <>
+            <Input
+              list="token-options"
+              value={selectedToken}
+              onChange={(e) => setSelectedToken(e.target.value.toUpperCase())}
+              placeholder="Digite o token"
               disabled={isSubmitting}
               className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
-            >
-              <SelectValue placeholder="Selecione um Token" />
-            </SelectTrigger>
-            <SelectContent>
+            />
+            <datalist id="token-options">
               {tokens.map((token) => (
-                <SelectItem key={token} value={token}>
-                  {token}
-                </SelectItem>
+                <option key={token} value={token} />
               ))}
-            </SelectContent>
-          </Select>
+            </datalist>
+          </>
+
           <p className="pt-1 text-[10px] text-blue-600 sm:text-xs">
             {tokenPrices[selectedToken]
               ? `Preço Atual: $${tokenPrices[selectedToken]}`
