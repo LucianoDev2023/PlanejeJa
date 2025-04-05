@@ -66,7 +66,7 @@ export default function TransactionCard({
   return (
     <Card className="m-2 border-transparent bg-gradient-to-b from-[#131D27] to-[#0f273d] p-0 text-gray-300">
       <CardContent className="relative flex items-center justify-center p-1 px-3">
-        <span className="absolute left-0 top-0 px-1 text-[8px] font-bold text-white opacity-50">
+        <span className="absolute left-0 top-0 rounded-full border border-gray-700 px-1 text-[8px] font-bold text-blue-400">
           {" "}
           {number}
         </span>

@@ -17,7 +17,7 @@ const filters: {
   { label: "Compras", value: "buy" },
   { label: "Vendas", value: "sell" },
   {
-    icon: <ArrowUpRight size={14} className="text-green-500" />,
+    icon: <ArrowUpRight size={14} className="rounded-md text-green-500" />,
     value: "positive",
   },
   {
