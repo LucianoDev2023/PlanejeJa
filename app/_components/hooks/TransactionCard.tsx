@@ -10,6 +10,7 @@ interface TransactionCardProps {
   currentPrice: string;
   onDelete: (id: string) => void | Promise<void>;
   onEdit: (transaction: Transaction) => void;
+  number: number;
 }
 
 export default function TransactionCard({
@@ -17,6 +18,7 @@ export default function TransactionCard({
   currentPrice,
   onDelete,
   onEdit,
+  number,
 }: TransactionCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -63,7 +65,11 @@ export default function TransactionCard({
 
   return (
     <Card className="m-2 border-transparent bg-gradient-to-b from-[#131D27] to-[#0f273d] p-0 text-gray-300">
-      <CardContent className="flex items-center justify-center p-1 px-3">
+      <CardContent className="relative flex items-center justify-center p-1 px-3">
+        <span className="absolute left-0 top-0 px-1 text-[8px] font-bold text-white opacity-50">
+          {" "}
+          {number}
+        </span>
         {isDeleting ? (
           <Loader2 className="h-20 w-6 animate-spin text-white sm:h-8" />
         ) : (

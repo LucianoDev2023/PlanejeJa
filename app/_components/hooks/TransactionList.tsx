@@ -27,12 +27,26 @@ export default function TransactionList({
     tokens?.[0] || "BTC",
   );
 
-  const [filter, setFilter] = useState<"all" | "buy" | "sell">("all");
+  const [filter, setFilter] = useState<
+    "all" | "buy" | "sell" | "positive" | "negative"
+  >("all");
 
-  const filteredTransactions =
-    filter === "all"
-      ? transactions
-      : transactions.filter((t) => t.type === filter);
+  const filteredTransactions = transactions.filter((t) => {
+    const amount = parseFloat(t.amount);
+    const invested = parseFloat(t.usdValue);
+    const priceNow = parseFloat(tokenPrices[t.token] || "0");
+
+    const profitBuy = amount * priceNow - invested;
+    const profitSell = parseFloat(t.profitSell ?? "0");
+    const profit = t.type === "buy" ? profitBuy : profitSell;
+
+    if (filter === "positive") return profit > 0;
+    if (filter === "negative") return profit < 0;
+    if (filter === "buy") return t.type === "buy";
+    if (filter === "sell") return t.type === "sell";
+
+    return true; // "all"
+  });
 
   const handleDelete = async (id: string) => {
     try {
@@ -86,7 +100,7 @@ export default function TransactionList({
       </div>
 
       {/* Apenas o filtro será fixo no topo */}
-      <div className="sticky top-0 z-10 border-b border-gray-800 bg-[#060D13]">
+      <div className="sticky top-0 z-10 flex border-b border-gray-800 bg-[#060D13]">
         <TransactionFilterToggle value={filter} onChange={setFilter} />
       </div>
 
@@ -100,13 +114,14 @@ export default function TransactionList({
       ) : transactions.length === 0 ? (
         <p className="pl-4 text-gray-400">Nenhuma transação encontrada.</p>
       ) : (
-        filteredTransactions.map((transaction) => (
+        filteredTransactions.map((transaction, index) => (
           <TransactionCard
             key={transaction.id}
             transaction={transaction}
             currentPrice={tokenPrices[transaction.token] || "0"}
             onDelete={handleDelete}
             onEdit={handleEdit}
+            number={index + 1} // aqui passamos o número (começando do 1)
           />
         ))
       )}
