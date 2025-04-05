@@ -169,7 +169,7 @@ export default function TradeForm({
   return (
     <div className="w-full border-b border-gray-800 bg-[#060D13] p-2 px-4 shadow-md">
       <p className="pb-3 text-center font-sans text-sm font-normal text-gray-300 sm:m-0 sm:mb-2 sm:mt-2 sm:pl-2 sm:text-base">
-        Registre sua transação de compra ou venda
+        Registre suas transações de compra ou venda
       </p>
       <form
         onSubmit={handleSubmit}
