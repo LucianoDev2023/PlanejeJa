@@ -63,16 +63,16 @@ const TokenPriceChart: React.FC<TokenPriceChartProps> = ({ selectedToken }) => {
     <div className="mt-1 flex w-full items-center justify-center gap-2 sm:mt-4">
       <p className="text-[8px] text-orange-500">Preços médios:</p>
       <p className="text-[8px] text-gray-300">
-        <span className="text-cyan-400">15m:</span> ${prices["15m"]}
+        <span className="text-cyan-400">15 min:</span> ${prices["15m"]}
       </p>
       <p className="text-[8px] text-gray-300">
-        <span className="text-yellow-500">1h:</span> ${prices["1h"]}
+        <span className="text-yellow-500">1 hora:</span> ${prices["1h"]}
       </p>
       <p className="text-[8px] text-gray-300">
-        <span className="text-green-500">4h:</span> ${prices["4h"]}
+        <span className="text-green-500">4 horas:</span> ${prices["4h"]}
       </p>
       <p className="text-[8px] text-gray-300">
-        <span className="text-pink-500">1d:</span> ${prices["1d"]}
+        <span className="text-pink-500">1 dia:</span> ${prices["1d"]}
       </p>
       <p className="pl-6 text-[8px] text-gray-700">Fonte: Binance</p>
     </div>
