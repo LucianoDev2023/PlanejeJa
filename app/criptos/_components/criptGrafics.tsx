@@ -52,7 +52,7 @@ const TokenPriceChart: React.FC<TokenPriceChartProps> = ({ selectedToken }) => {
   }, [selectedToken, fetchPrices]);
 
   // Renderização condicional
-  if (loading) return <p className="text-[10px]">Carregando preços...</p>;
+  if (loading) return <p className="text-[10px]">Carregando médias...</p>;
   if (error) return <p>{error}</p>;
   if (!prices || Object.keys(prices).length === 0)
     return (
