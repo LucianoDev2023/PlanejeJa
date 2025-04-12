@@ -74,6 +74,7 @@ const TokenPriceChart: React.FC<TokenPriceChartProps> = ({ selectedToken }) => {
       <p className="text-[8px] text-gray-300">
         <span className="text-pink-500">1d:</span> ${prices["1d"]}
       </p>
+      <p className="pl-6 text-[8px] text-gray-700">Fonte: Binance</p>
     </div>
   );
 };
