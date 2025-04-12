@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Input } from "../ui/input";
+import TokenPriceChart from "@/app/criptos/_components/criptGrafics";
 
 interface TradeFormProps {
   onAddTransaction: (transaction: Transaction) => void;
@@ -297,6 +298,7 @@ export default function TradeForm({
           </button>
         </div>
       </form>
+      <TokenPriceChart selectedToken={selectedToken} />
     </div>
   );
 }
