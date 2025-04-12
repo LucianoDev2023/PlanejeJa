@@ -12,7 +12,7 @@ const getAveragePrices = async (symbol: string, intervals: string[]) => {
   for (const interval of intervals) {
     try {
       const response = await fetch(
-        `${baseUrl}?symbol=${symbol}USDT&interval=${interval}&limit=10`,
+        `${baseUrl}?symbol=${symbol}USDT&interval=${interval}&limit=2`,
       );
 
       if (!response.ok) {
