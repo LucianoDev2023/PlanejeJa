@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Transaction {
+  id            String                   @id @default(uuid())
+  name          String
+  type          TransactionType
+  amount        Decimal                  @db.Decimal(10, 2)
+  category      TransactionCategory
+  paymentMethod TransactionPaymentMethod
+  date          DateTime
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  userId        String
+}
+
+
+enum TransactionType {
+  DEPOSIT
+  EXPENSE
+  INVESTMENT
+}
+
+enum TransactionCategory {
+  HOUSING
+  TRANSPORTATION
+  FOOD
+  ENTERTAINMENT
+  HEALTH
+  INVESTMENT
+  SALARY
+  EDUCATION
+  OTHER
+  INTEREST 
+}
+
+enum TransactionPaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  BANK_SLIP
+  CASH
+  PIX
+  OTHER
+}
+
+model CryptoTransaction {
+  id              String   @id @default(uuid())
+  token           String
+  type            String
+  usdValue        String
+  amount          String
+  price           String
+  date            DateTime @default(now())
+  sellTokenPrice  String?
+  profitSell      String?
+  userId          String   // <-- novo campo obrigatório
+}
