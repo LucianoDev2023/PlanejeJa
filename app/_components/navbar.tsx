@@ -31,7 +31,7 @@ const Navbar = ({
   const { signOut } = useAuth();
 
   const links = [
-    { href: "/", label: "Início", className: inicioClass },
+    { href: "/", label: "Início_teste", className: inicioClass },
     { href: "/transactions", label: "Transações", className: transacoesClass },
     { href: "/criptos", label: "Criptos", className: criptosClass },
     { href: "/subscription", label: "Assinatura", className: assinaturaClass },

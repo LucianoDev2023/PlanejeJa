@@ -20,7 +20,7 @@ export default async function Criptos() {
       </div>
       {/* Rodapé com o Tour */}
       <div className="fixed bottom-0 w-full bg-[#060D13] shadow-inner">
-        <TradeFormTour />
+        {/* <TradeFormTour /> */}
       </div>
     </div>
   );

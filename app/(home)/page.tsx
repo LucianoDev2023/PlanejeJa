@@ -168,7 +168,7 @@ const Home = async ({ searchParams: { month, year, opcao } }: HomeProps) => {
           </div>
         </div>
       </div>
-      <Tour />
+      {/* <Tour /> */}
     </div>
   );
 };
