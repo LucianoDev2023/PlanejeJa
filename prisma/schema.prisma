@@ -63,3 +63,14 @@ model CryptoTransaction {
   profitSell      String?
   userId          String   // <-- novo campo obrigatório
 }
+
+
+model PriceSnapshot {
+  id         String   @id @default(uuid())
+  symbol     String
+  priceUsd   Decimal  @db.Decimal(18, 8)
+  capturedAt DateTime
+
+  @@index([symbol, capturedAt])
+}
+
