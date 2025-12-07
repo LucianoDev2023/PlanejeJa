@@ -34,6 +34,7 @@ const Navbar = ({
     { href: "/", label: "Início", className: inicioClass },
     { href: "/transactions", label: "Transações", className: transacoesClass },
     { href: "/criptos", label: "Criptos", className: criptosClass },
+    { href: "/coins/BTC", label: "Analises", className: "" }, // NOVO LINK
     { href: "/subscription", label: "Assinaturas", className: assinaturaClass },
   ];
 
