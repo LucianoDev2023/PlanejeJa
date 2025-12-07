@@ -11,12 +11,14 @@ import {
   type LineData,
   type MouseEventParams,
   type UTCTimestamp,
+  type Time,
 } from "lightweight-charts";
 import { formatInTimeZone } from "date-fns-tz";
 
 interface PnlPoint {
-  time: string;
-  timeLabel: string;
+  time: string; // ISO string da API (UTC)
+  unixTime: UTCTimestamp; // timestamp em segundos (usado no gráfico)
+  timeLabel: string; // label já formatado em BRT
   price: number;
   profit: number;
   delta: number;
@@ -34,9 +36,9 @@ interface PnlSeriesResponse {
 }
 
 interface OperationPnlChartProps {
-  symbol: string; // "BTC", "ETH" etc.
-  operationId?: string; // opcional: filtro por operação específica
-  autoRefreshMs?: number; // 🔹 NOVO: intervalo em ms (ex: 60000)
+  symbol: string;
+  operationId?: string;
+  autoRefreshMs?: number; // intervalo polling em ms
 }
 
 interface HoverInfo {
@@ -60,7 +62,7 @@ const formatCurrency = (value: number): string =>
 export function OperationPnlChart({
   symbol,
   operationId,
-  autoRefreshMs = 60_000, // 🔹 1 minuto por padrão
+  autoRefreshMs = 60_000,
 }: OperationPnlChartProps) {
   const [data, setData] = useState<PnlPoint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -70,7 +72,7 @@ export function OperationPnlChart({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
 
-  // ================== FETCH DOS DADOS (COM POLLING) ==================
+  // ================== FETCH + POLLING ==================
   useEffect(() => {
     if (!symbol) return;
 
@@ -110,8 +112,14 @@ export function OperationPnlChart({
           const profit = Number(p.profit);
           const delta = Number(p.delta);
 
+          // 🔹 timestamp numérico (segundos desde epoch, UTC)
+          const unixTime = Math.floor(
+            new Date(p.time).getTime() / 1000,
+          ) as UTCTimestamp;
+
           return {
             time: p.time,
+            unixTime,
             timeLabel: formatInTimeZone(p.time, TIMEZONE, TIME_LABEL_FORMAT),
             price: Number.isFinite(price) ? price : 0,
             profit: Number.isFinite(profit) ? profit : 0,
@@ -122,7 +130,6 @@ export function OperationPnlChart({
         setData(formatted);
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
-          // fetch cancelado no cleanup → ignora
           return;
         }
         if (err instanceof Error) setError(err.message);
@@ -132,27 +139,23 @@ export function OperationPnlChart({
       }
     };
 
-    // 🔹 Busca imediata ao montar / mudar deps
     fetchData();
 
-    // 🔹 Polling a cada X ms, se configurado
     if (autoRefreshMs && autoRefreshMs > 0) {
       intervalId = window.setInterval(() => {
-        // cancela eventual requisição anterior
         abortController.abort();
         abortController = new AbortController();
         fetchData();
       }, autoRefreshMs);
     }
 
-    // 🔹 cleanup ao desmontar / mudar deps
     return () => {
       abortController.abort();
       if (intervalId) window.clearInterval(intervalId);
     };
   }, [symbol, operationId, autoRefreshMs]);
 
-  // ================== CÁLCULO DE LUCRO MÁXIMO / MÍNIMO ==================
+  // ================== EXTREMOS DE LUCRO ==================
   const profitExtrema = useMemo(() => {
     if (!data.length) return null;
 
@@ -215,6 +218,16 @@ export function OperationPnlChart({
         visible: true,
         borderColor: "rgba(75, 85, 99, 0.8)",
       },
+      // 🔥 Eixo X em horário do Brasil (BRT)
+      localization: {
+        timeFormatter: (time: Time): string => {
+          if (typeof time === "number") {
+            const unixMs = time * 1000;
+            return formatInTimeZone(unixMs, TIMEZONE, "HH:mm");
+          }
+          return String(time);
+        },
+      },
       timeScale: {
         borderColor: "rgba(75, 85, 99, 0.8)",
         timeVisible: true,
@@ -231,6 +244,7 @@ export function OperationPnlChart({
           width: 1,
           style: 0,
         },
+        mode: 1,
       },
     });
 
@@ -272,12 +286,12 @@ export function OperationPnlChart({
     }) as ISeriesApi<"Line">;
 
     const profitData: LineData[] = data.map((p) => ({
-      time: Math.floor(new Date(p.time).getTime() / 1000) as UTCTimestamp,
+      time: p.unixTime,
       value: p.profit,
     }));
 
     const priceData: LineData[] = data.map((p) => ({
-      time: Math.floor(new Date(p.time).getTime() / 1000) as UTCTimestamp,
+      time: p.unixTime,
       value: p.price,
     }));
 
@@ -292,7 +306,9 @@ export function OperationPnlChart({
         return;
       }
 
-      const timestamp = param.time as UTCTimestamp;
+      const logicalTime = param.time as UTCTimestamp;
+
+      const hoveredPoint = data.find((p) => p.unixTime === logicalTime);
 
       const profitPoint = param.seriesData.get(profitSeries);
       const pricePoint = param.seriesData.get(priceSeries);
@@ -306,11 +322,9 @@ export function OperationPnlChart({
         pricePoint && "value" in pricePoint ? Number(pricePoint.value) : null;
 
       setHoverInfo({
-        timeLabel: formatInTimeZone(
-          timestamp * 1000,
-          TIMEZONE,
-          TIME_LABEL_FORMAT,
-        ),
+        timeLabel:
+          hoveredPoint?.timeLabel ??
+          formatInTimeZone(logicalTime * 1000, TIMEZONE, TIME_LABEL_FORMAT),
         price: priceValue,
         profit: profitValue,
       });
@@ -321,10 +335,7 @@ export function OperationPnlChart({
     const ro = new ResizeObserver(() => {
       if (!containerRef.current || !chartRef.current) return;
       const { clientWidth: w, clientHeight: h } = containerRef.current;
-      chartRef.current.applyOptions({
-        width: w,
-        height: h,
-      });
+      chartRef.current.applyOptions({ width: w, height: h });
     });
 
     ro.observe(containerRef.current);
@@ -339,7 +350,7 @@ export function OperationPnlChart({
     };
   }, [data]);
 
-  // ================== ESTADOS DE CARREGAMENTO / ERRO / EMPTY ==================
+  // ================== ESTADOS ==================
   if (loading && !data.length) {
     return (
       <div className="flex h-[70vh] w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-sm text-slate-300">
@@ -368,7 +379,7 @@ export function OperationPnlChart({
     <div className="relative flex h-[70vh] w-full flex-col rounded-xl border border-slate-700 bg-gradient-to-b from-slate-900 to-slate-950 p-3">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-100">
-          {symbol} — Lucro x Preço (últimas horas)
+          {symbol} — Lucro x Preço
         </h3>
         <span className="text-[11px] text-slate-400">
           Eixo esquerdo: lucro • Eixo direito: preço • Horário: Brasília (BRT)
