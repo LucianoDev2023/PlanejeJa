@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/prisma/client";
 import { CoinAnalyticsClient } from "./CoinAnalyticsClient";
+import Navbar from "@/app/_components/navbar";
 
 export default async function CoinAnalyticsPage({
   params,
@@ -12,7 +13,6 @@ export default async function CoinAnalyticsPage({
   const { userId } = auth();
 
   if (!userId) {
-    // ajuste o caminho de login conforme seu app
     redirect("/sign-in");
   }
 
@@ -20,7 +20,7 @@ export default async function CoinAnalyticsPage({
   const tokens = await prisma.cryptoTransaction.findMany({
     where: {
       userId,
-      type: "buy", // você grava "buy" na criação da transação
+      type: "buy",
     },
     select: { token: true },
     distinct: ["token"],
@@ -33,6 +33,14 @@ export default async function CoinAnalyticsPage({
   if (availableSymbols.length === 0) {
     return (
       <main className="mx-auto flex max-w-5xl flex-col gap-4 p-4 text-slate-100">
+        <Navbar
+          logoClass="joyride-logo"
+          inicioClass="joyride-inicio"
+          transacoesClass="joyride-transacoes"
+          criptosClass="joyride-criptos"
+          assinaturaClass="joyride-assinatura"
+        />
+
         <h1 className="text-xl font-bold">Análise de Criptomoedas</h1>
         <p className="text-sm text-slate-300">
           Você ainda não possui operações de compra registradas. Cadastre uma
@@ -48,9 +56,21 @@ export default async function CoinAnalyticsPage({
     : availableSymbols[0];
 
   return (
-    <CoinAnalyticsClient
-      availableSymbols={availableSymbols}
-      initialSymbol={initialSymbol}
-    />
+    <div className="flex h-full flex-col">
+      <Navbar
+        logoClass="joyride-logo"
+        inicioClass="joyride-inicio"
+        transacoesClass="joyride-transacoes"
+        criptosClass="joyride-criptos"
+        assinaturaClass="joyride-assinatura"
+      />
+
+      <div className="flex-1 overflow-auto">
+        <CoinAnalyticsClient
+          availableSymbols={availableSymbols}
+          initialSymbol={initialSymbol}
+        />
+      </div>
+    </div>
   );
 }
