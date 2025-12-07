@@ -59,6 +59,12 @@ const formatCurrency = (value: number): string =>
     maximumFractionDigits: 2,
   }).format(value);
 
+const formatTokenPrice = (value: number): string => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "-";
+  return num < 1 ? num.toFixed(6) : num.toFixed(2);
+};
+
 export function OperationPnlChart({
   symbol,
   operationId,
@@ -263,6 +269,10 @@ export function OperationPnlChart({
     const lastProfit = data[data.length - 1].profit;
     const isProfitPositive = lastProfit >= 0;
 
+    const lastPrice = data[data.length - 1].price;
+    const pricePrecision = lastPrice < 1 ? 4 : 2;
+    const priceMinMove = lastPrice < 1 ? 0.000001 : 0.01;
+
     const profitLineColor = isProfitPositive ? "#22c55e" : "#ef4444";
     const profitTopColor = isProfitPositive
       ? "rgba(34,197,94,0.35)"
@@ -283,6 +293,11 @@ export function OperationPnlChart({
       priceScaleId: "right",
       color: "#3b82f6",
       lineWidth: 2,
+      priceFormat: {
+        type: "price",
+        precision: pricePrecision,
+        minMove: priceMinMove,
+      },
     }) as ISeriesApi<"Line">;
 
     const profitData: LineData[] = data.map((p) => ({
@@ -395,10 +410,11 @@ export function OperationPnlChart({
             <div>
               Preço:{" "}
               <span className="font-semibold">
-                {formatCurrency(hoverInfo.price)}
+                ${formatTokenPrice(hoverInfo.price)}
               </span>
             </div>
           )}
+
           {hoverInfo.profit !== null && (
             <div>
               Lucro:{" "}

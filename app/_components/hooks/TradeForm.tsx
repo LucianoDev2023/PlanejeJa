@@ -298,7 +298,7 @@ export default function TradeForm({
           </button>
         </div>
       </form>
-      <TokenPriceChart selectedToken={selectedToken} />
+      {/* <TokenPriceChart selectedToken={selectedToken} /> responsável por apresentar as médias, nao está sendo útil */}
     </div>
   );
 }
