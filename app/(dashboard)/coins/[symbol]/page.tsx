@@ -44,7 +44,7 @@ export default async function CoinAnalyticsPage({
         <h1 className="text-xl font-bold">Análise de Criptomoedas</h1>
         <p className="text-sm text-slate-300">
           Você ainda não possui operações de compra registradas. Cadastre uma
-          transação para ver o gráfico de lucro por hora.
+          transação para ver o gráfico de lucro por hora...
         </p>
       </main>
     );
