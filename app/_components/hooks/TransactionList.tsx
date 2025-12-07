@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Transaction } from "./TradeForm";
 import TransactionCard from "./TransactionCard";
 import TradeForm from "./TradeForm";
-import TransactionFilterToggle from "@/app/criptos/_components/TransactionFilterToggle";
+import TransactionFilterToggle, {
+  TransactionFilterValue,
+} from "@/app/criptos/_components/TransactionFilterToggle";
+import { CoinAnalyticsClient } from "@/app/(dashboard)/coins/[symbol]/CoinAnalyticsClient";
 
 interface TransactionListProps {
   tokenPrices: { [key: string]: string };
   transactions: Transaction[];
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
-  tokens: string[];
+  tokens: string[]; // pode continuar existindo, mas não vamos usar para o select de gráfico
   loading: boolean;
 }
 
@@ -23,13 +26,12 @@ export default function TransactionList({
 }: TransactionListProps) {
   const [transactionBeingEdited, setTransactionBeingEdited] =
     useState<Transaction | null>(null);
+
   const [selectedToken, setSelectedToken] = useState<string>(
     tokens?.[0] || "BTC",
   );
 
-  const [filter, setFilter] = useState<
-    "all" | "buy" | "sell" | "positive" | "negative"
-  >("all");
+  const [filter, setFilter] = useState<TransactionFilterValue>("all");
 
   const filteredTransactions = transactions.filter((t) => {
     const amount = parseFloat(t.amount);
@@ -45,7 +47,7 @@ export default function TransactionList({
     if (filter === "buy") return t.type === "buy";
     if (filter === "sell") return t.type === "sell";
 
-    return true; // "all"
+    return true; // "all" e "chart"
   });
 
   const handleDelete = async (id: string) => {
@@ -60,7 +62,6 @@ export default function TransactionList({
 
       setTransactions((prev) => prev.filter((t) => t.id !== id));
 
-      // 🧹 Se a transação deletada era a que estava sendo editada, limpa o formulário
       if (transactionBeingEdited?.id === id) {
         clearEditing();
       }
@@ -70,7 +71,6 @@ export default function TransactionList({
   };
 
   const handleEdit = (transaction: Transaction) => {
-    console.log("🟡 Recebido para edição:", transaction);
     setTransactionBeingEdited(transaction);
   };
 
@@ -81,6 +81,33 @@ export default function TransactionList({
   };
 
   const clearEditing = () => setTransactionBeingEdited(null);
+
+  const handleFilterChange = (newFilter: TransactionFilterValue) => {
+    setFilter(newFilter);
+  };
+
+  // 🔹 AQUI: só tokens com pelo menos UMA transação de COMPRA
+  const availableSymbols = useMemo(() => {
+    const set = new Set<string>();
+
+    for (const t of transactions) {
+      if (t.type === "buy" && t.token) {
+        set.add(t.token.trim().toUpperCase());
+      }
+    }
+
+    return Array.from(set);
+  }, [transactions]);
+
+  const initialSymbol = useMemo(() => {
+    const selUpper = (transactionBeingEdited?.token || selectedToken)
+      .trim()
+      .toUpperCase();
+
+    if (availableSymbols.includes(selUpper)) return selUpper;
+
+    return availableSymbols[0] ?? "BTC";
+  }, [availableSymbols, selectedToken, transactionBeingEdited]);
 
   return (
     <div className="flex w-full flex-col">
@@ -99,19 +126,25 @@ export default function TransactionList({
         />
       </div>
 
-      {/* Apenas o filtro será fixo no topo */}
       <div className="sticky top-0 z-10 flex border-b border-gray-800 bg-[#060D13]">
-        <TransactionFilterToggle value={filter} onChange={setFilter} />
+        <TransactionFilterToggle value={filter} onChange={handleFilterChange} />
       </div>
 
-      {loading ? (
+      {filter === "chart" ? (
+        <div className="w-full">
+          <CoinAnalyticsClient
+            availableSymbols={availableSymbols}
+            initialSymbol={initialSymbol}
+          />
+        </div>
+      ) : loading ? (
         Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
             className="mx-2 mt-4 flex h-20 animate-pulse rounded-lg bg-gradient-to-b from-[#131d276e] to-[#0f273d6b] sm:h-10"
-          ></div>
+          />
         ))
-      ) : transactions.length === 0 ? (
+      ) : filteredTransactions.length === 0 ? (
         <p className="pl-4 text-gray-400">Nenhuma transação encontrada.</p>
       ) : (
         filteredTransactions.map((transaction, index) => (
@@ -121,7 +154,7 @@ export default function TransactionList({
             currentPrice={tokenPrices[transaction.token] || "0"}
             onDelete={handleDelete}
             onEdit={handleEdit}
-            number={index + 1} // aqui passamos o número (começando do 1)
+            number={index + 1}
           />
         ))
       )}

@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   createChart,
   ColorType,
   LineSeries,
+  AreaSeries,
   type IChartApi,
+  type ISeriesApi,
   type LineData,
-  type UTCTimestamp,
   type MouseEventParams,
+  type UTCTimestamp,
 } from "lightweight-charts";
+import { formatInTimeZone } from "date-fns-tz";
 
 interface PnlPoint {
   time: string;
@@ -31,21 +34,33 @@ interface PnlSeriesResponse {
 }
 
 interface OperationPnlChartProps {
-  symbol: string; // "BTC", "BNB", etc.
-  hours?: number; // padrão 24
-  operationId?: string; // opcional: gráfico só de uma operação específica
+  symbol: string; // "BTC", "ETH" etc.
+  operationId?: string; // opcional: filtro por operação específica
+  autoRefreshMs?: number; // 🔹 NOVO: intervalo em ms (ex: 60000)
 }
 
 interface HoverInfo {
   timeLabel: string;
-  price: number | null; // valor REAL
-  profit: number | null; // valor REAL
+  price: number | null;
+  profit: number | null;
 }
+
+const TIMEZONE = "America/Sao_Paulo";
+const TIME_LABEL_FORMAT = "dd/MM HH:mm";
+const SUMMARY_TIME_FORMAT = "dd/MM/yyyy HH:mm";
+
+const formatCurrency = (value: number): string =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
 
 export function OperationPnlChart({
   symbol,
-  hours = 24,
   operationId,
+  autoRefreshMs = 60_000, // 🔹 1 minuto por padrão
 }: OperationPnlChartProps) {
   const [data, setData] = useState<PnlPoint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,9 +70,12 @@ export function OperationPnlChart({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
 
-  // ================== FETCH DOS DADOS ==================
+  // ================== FETCH DOS DADOS (COM POLLING) ==================
   useEffect(() => {
     if (!symbol) return;
+
+    let abortController = new AbortController();
+    let intervalId: number | undefined;
 
     const fetchData = async () => {
       try {
@@ -65,41 +83,36 @@ export function OperationPnlChart({
         setError(null);
 
         const params = new URLSearchParams();
-        params.set("hours", String(hours));
         if (operationId) params.set("operationId", operationId);
 
         const res = await fetch(
-          `/api/coins/${symbol}/pnl-series?` + params.toString(),
-          { cache: "no-store" },
+          `/api/coins/${symbol}/pnl-series?${params.toString()}`,
+          {
+            cache: "no-store",
+            signal: abortController.signal,
+          },
         );
 
-        if (!res.ok) {
-          const body = await res.json().catch(() => undefined);
-          throw new Error(body?.error || "Erro ao buscar dados de PnL");
+        const json = (await res.json().catch(() => undefined)) as
+          | (PnlSeriesResponse & { error?: string })
+          | undefined;
+
+        if (!res.ok || !json) {
+          throw new Error(json?.error || "Erro ao buscar dados de PnL");
         }
 
-        const json = (await res.json()) as PnlSeriesResponse;
-
-        // ordena por tempo crescente (obrigatório pro lightweight-charts)
         const sorted = [...json.data].sort(
           (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime(),
         );
 
         const formatted: PnlPoint[] = sorted.map((p) => {
-          const date = new Date(p.time);
-
           const price = Number(p.price);
           const profit = Number(p.profit);
           const delta = Number(p.delta);
 
           return {
             time: p.time,
-            timeLabel: date.toLocaleString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+            timeLabel: formatInTimeZone(p.time, TIMEZONE, TIME_LABEL_FORMAT),
             price: Number.isFinite(price) ? price : 0,
             profit: Number.isFinite(profit) ? profit : 0,
             delta: Number.isFinite(delta) ? delta : 0,
@@ -108,6 +121,10 @@ export function OperationPnlChart({
 
         setData(formatted);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          // fetch cancelado no cleanup → ignora
+          return;
+        }
         if (err instanceof Error) setError(err.message);
         else setError("Erro ao carregar dados");
       } finally {
@@ -115,15 +132,63 @@ export function OperationPnlChart({
       }
     };
 
+    // 🔹 Busca imediata ao montar / mudar deps
     fetchData();
-  }, [symbol, hours, operationId]);
+
+    // 🔹 Polling a cada X ms, se configurado
+    if (autoRefreshMs && autoRefreshMs > 0) {
+      intervalId = window.setInterval(() => {
+        // cancela eventual requisição anterior
+        abortController.abort();
+        abortController = new AbortController();
+        fetchData();
+      }, autoRefreshMs);
+    }
+
+    // 🔹 cleanup ao desmontar / mudar deps
+    return () => {
+      abortController.abort();
+      if (intervalId) window.clearInterval(intervalId);
+    };
+  }, [symbol, operationId, autoRefreshMs]);
+
+  // ================== CÁLCULO DE LUCRO MÁXIMO / MÍNIMO ==================
+  const profitExtrema = useMemo(() => {
+    if (!data.length) return null;
+
+    let maxPoint = data[0];
+    let minPoint = data[0];
+
+    for (const p of data) {
+      if (p.profit > maxPoint.profit) maxPoint = p;
+      if (p.profit < minPoint.profit) minPoint = p;
+    }
+
+    return {
+      max: {
+        value: maxPoint.profit,
+        timeLabel: formatInTimeZone(
+          maxPoint.time,
+          TIMEZONE,
+          SUMMARY_TIME_FORMAT,
+        ),
+      },
+      min: {
+        value: minPoint.profit,
+        timeLabel: formatInTimeZone(
+          minPoint.time,
+          TIMEZONE,
+          SUMMARY_TIME_FORMAT,
+        ),
+      },
+    };
+  }, [data]);
 
   // ================== CRIA / ATUALIZA GRÁFICO ==================
   useEffect(() => {
     if (!containerRef.current) return;
     if (!data.length) return;
 
-    // destrói gráfico anterior pra evitar leak
     if (chartRef.current) {
       chartRef.current.remove();
       chartRef.current = null;
@@ -142,7 +207,6 @@ export function OperationPnlChart({
         vertLines: { color: "rgba(55, 65, 81, 0.4)" },
         horzLines: { color: "rgba(31, 41, 55, 0.7)" },
       },
-      // dois price scales visíveis
       rightPriceScale: {
         visible: true,
         borderColor: "rgba(75, 85, 99, 0.8)",
@@ -172,7 +236,6 @@ export function OperationPnlChart({
 
     chartRef.current = chart;
 
-    // força os dois eixos a ficarem visíveis
     chart.priceScale("left").applyOptions({
       visible: true,
       autoScale: true,
@@ -183,29 +246,39 @@ export function OperationPnlChart({
       autoScale: true,
     });
 
-    // série de LUCRO (lado esquerdo, com escala visual x100)
-    const profitSeries = chart.addSeries(LineSeries, {
-      priceScaleId: "left",
-      color: "#22c55e",
-      lineWidth: 3,
-    });
+    const lastProfit = data[data.length - 1].profit;
+    const isProfitPositive = lastProfit >= 0;
 
-    // série de PREÇO (lado direito, valor real)
+    const profitLineColor = isProfitPositive ? "#22c55e" : "#ef4444";
+    const profitTopColor = isProfitPositive
+      ? "rgba(34,197,94,0.35)"
+      : "rgba(239,68,68,0.35)";
+    const profitBottomColor = isProfitPositive
+      ? "rgba(34,197,94,0.02)"
+      : "rgba(239,68,68,0.02)";
+
+    const profitSeries = chart.addSeries(AreaSeries, {
+      priceScaleId: "left",
+      lineColor: profitLineColor,
+      topColor: profitTopColor,
+      bottomColor: profitBottomColor,
+      lineWidth: 3,
+    }) as ISeriesApi<"Area">;
+
     const priceSeries = chart.addSeries(LineSeries, {
       priceScaleId: "right",
       color: "#3b82f6",
       lineWidth: 2,
-    });
+    }) as ISeriesApi<"Line">;
 
     const profitData: LineData[] = data.map((p) => ({
       time: Math.floor(new Date(p.time).getTime() / 1000) as UTCTimestamp,
-      // aplica multiplicador visual para o gráfico
-      value: Number(p.profit) || 0,
+      value: p.profit,
     }));
 
     const priceData: LineData[] = data.map((p) => ({
       time: Math.floor(new Date(p.time).getTime() / 1000) as UTCTimestamp,
-      value: Number(p.price) || 0,
+      value: p.price,
     }));
 
     profitSeries.setData(profitData);
@@ -213,7 +286,6 @@ export function OperationPnlChart({
 
     chart.timeScale().fitContent();
 
-    // --------- Tooltip customizado (lucro real + preço) ---------
     const crosshairHandler = (param: MouseEventParams): void => {
       if (param.time === undefined) {
         setHoverInfo(null);
@@ -221,38 +293,31 @@ export function OperationPnlChart({
       }
 
       const timestamp = param.time as UTCTimestamp;
-      const date = new Date(timestamp * 1000);
 
       const profitPoint = param.seriesData.get(profitSeries);
       const pricePoint = param.seriesData.get(priceSeries);
 
-      // valor ESCALADO que está no gráfico
-      const scaledProfit =
+      const profitValue =
         profitPoint && "value" in profitPoint
           ? Number(profitPoint.value)
           : null;
 
-      // valor REAL (sem multiplicador)
-      const rawProfit = scaledProfit !== null ? scaledProfit : null;
-
-      const price =
+      const priceValue =
         pricePoint && "value" in pricePoint ? Number(pricePoint.value) : null;
 
       setHoverInfo({
-        timeLabel: date.toLocaleString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        price,
-        profit: rawProfit,
+        timeLabel: formatInTimeZone(
+          timestamp * 1000,
+          TIMEZONE,
+          TIME_LABEL_FORMAT,
+        ),
+        price: priceValue,
+        profit: profitValue,
       });
     };
 
     chart.subscribeCrosshairMove(crosshairHandler);
 
-    // --------- Resize responsivo com ResizeObserver ---------
     const ro = new ResizeObserver(() => {
       if (!containerRef.current || !chartRef.current) return;
       const { clientWidth: w, clientHeight: h } = containerRef.current;
@@ -274,9 +339,8 @@ export function OperationPnlChart({
     };
   }, [data]);
 
-  // ================== ESTADOS DE CARREGAMENTO / ERRO ==================
-
-  if (loading) {
+  // ================== ESTADOS DE CARREGAMENTO / ERRO / EMPTY ==================
+  if (loading && !data.length) {
     return (
       <div className="flex h-[70vh] w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-sm text-slate-300">
         Carregando gráfico de PnL...
@@ -300,20 +364,17 @@ export function OperationPnlChart({
     );
   }
 
-  // ================== LAYOUT DO CARD + TOOLTIP ==================
-
   return (
     <div className="relative flex h-[70vh] w-full flex-col rounded-xl border border-slate-700 bg-gradient-to-b from-slate-900 to-slate-950 p-3">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-100">
-          {symbol} — Lucro x Preço (últimas {hours}h)
+          {symbol} — Lucro x Preço (últimas horas)
         </h3>
         <span className="text-[11px] text-slate-400">
-          Eixo esquerdo: lucro • Eixo direito: preço
+          Eixo esquerdo: lucro • Eixo direito: preço • Horário: Brasília (BRT)
         </span>
       </div>
 
-      {/* Tooltip customizado, com valores reais */}
       {hoverInfo && (
         <div className="pointer-events-none absolute right-4 top-9 z-10 rounded-md border border-slate-700 bg-slate-900/95 px-2 py-1 text-[10px] text-slate-100 shadow-lg">
           <div className="mb-1 text-[9px] text-slate-400">
@@ -323,7 +384,7 @@ export function OperationPnlChart({
             <div>
               Preço:{" "}
               <span className="font-semibold">
-                ${hoverInfo.price.toFixed(2)}
+                {formatCurrency(hoverInfo.price)}
               </span>
             </div>
           )}
@@ -335,15 +396,35 @@ export function OperationPnlChart({
                   hoverInfo.profit >= 0 ? "text-emerald-400" : "text-red-400"
                 }
               >
-                {hoverInfo.profit >= 0 ? "+" : ""}${hoverInfo.profit.toFixed(4)}
+                {formatCurrency(hoverInfo.profit)}
               </span>
             </div>
           )}
         </div>
       )}
 
-      {/* Essa div ocupa TODO o espaço restante do card */}
       <div ref={containerRef} className="mt-1 h-full w-full" />
+
+      {profitExtrema && (
+        <div className="mt-3 grid gap-2 text-[11px] text-slate-300 sm:grid-cols-2">
+          <div>
+            <span className="font-semibold text-emerald-400">
+              Lucro máximo:{" "}
+            </span>
+            <span>{formatCurrency(profitExtrema.max.value)} </span>
+            <span className="text-slate-400">
+              em {profitExtrema.max.timeLabel}
+            </span>
+          </div>
+          <div>
+            <span className="font-semibold text-red-400">Lucro mínimo: </span>
+            <span>{formatCurrency(profitExtrema.min.value)} </span>
+            <span className="text-slate-400">
+              em {profitExtrema.min.timeLabel}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
