@@ -224,16 +224,6 @@ export function OperationPnlChart({
         visible: true,
         borderColor: "rgba(75, 85, 99, 0.8)",
       },
-      // 🔥 Eixo X em horário do Brasil (BRT)
-      localization: {
-        timeFormatter: (time: Time): string => {
-          if (typeof time === "number") {
-            const unixMs = time * 1000;
-            return formatInTimeZone(unixMs, TIMEZONE, "HH:mm");
-          }
-          return String(time);
-        },
-      },
       timeScale: {
         borderColor: "rgba(75, 85, 99, 0.8)",
         timeVisible: true,
@@ -251,6 +241,27 @@ export function OperationPnlChart({
           style: 0,
         },
         mode: 1,
+      },
+
+      // 🔥 AQUI: eixo X sempre usa o mesmo timeLabel do tooltip (BRT)
+      localization: {
+        timeFormatter: (time: Time): string => {
+          if (typeof time === "number") {
+            const ts = time as UTCTimestamp;
+
+            // procura o ponto correspondente
+            const point = data.find((p) => p.unixTime === ts);
+            if (point) {
+              // já está em horário BR e 24h
+              return point.timeLabel;
+            }
+
+            // fallback caso não encontre (zoom longe etc.)
+            return formatInTimeZone(ts * 1000, TIMEZONE, "HH:mm");
+          }
+
+          return String(time);
+        },
       },
     });
 
@@ -286,13 +297,13 @@ export function OperationPnlChart({
       lineColor: profitLineColor,
       topColor: profitTopColor,
       bottomColor: profitBottomColor,
-      lineWidth: 3,
+      lineWidth: 1,
     }) as ISeriesApi<"Area">;
 
     const priceSeries = chart.addSeries(LineSeries, {
       priceScaleId: "right",
-      color: "#3b82f6",
-      lineWidth: 2,
+      color: "#3378FF",
+      lineWidth: 1,
       priceFormat: {
         type: "price",
         precision: pricePrecision,
@@ -396,9 +407,6 @@ export function OperationPnlChart({
         <h3 className="text-sm font-semibold text-slate-100">
           {symbol} — Lucro x Preço
         </h3>
-        <span className="text-[11px] text-slate-400">
-          Eixo esquerdo: lucro • Eixo direito: preço • Horário: Brasília (BRT)
-        </span>
       </div>
 
       {hoverInfo && (
