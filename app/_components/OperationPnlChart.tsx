@@ -434,7 +434,7 @@ export function OperationPnlChart({
         style={{
           // 100vh menos a altura aproximada do cabeçalho + formulário + filtros
           // Ajusta esse 260 até ficar confortável na sua tela
-          height: "calc(100vh - 330px)",
+          height: "calc(100vh - 400px)",
         }}
       />
 
