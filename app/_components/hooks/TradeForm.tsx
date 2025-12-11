@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Input } from "../ui/input";
-import TokenPriceChart from "@/app/criptos/_components/criptGrafics";
 
 interface TradeFormProps {
   onAddTransaction: (transaction: Transaction) => void;
@@ -193,7 +192,7 @@ export default function TradeForm({
             </datalist>
           </>
 
-          <p className="pt-1 text-[10px] text-blue-600 sm:text-xs">
+          <p className="pt-1 text-[10px] text-blue-400 sm:text-xs">
             {tokenPrices[selectedToken]
               ? `Preço Atual: $${tokenPrices[selectedToken]}`
               : "Carregando..."}
@@ -219,7 +218,7 @@ export default function TradeForm({
               <SelectItem value="sell">Venda</SelectItem>
             </SelectContent>
           </Select>
-          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-400 md:text-sm">
             Tipo de operação
           </p>
         </div>
@@ -234,7 +233,7 @@ export default function TradeForm({
             required
             className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
           />
-          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-400 md:text-sm">
             {formData.type === "buy"
               ? "Total do investimento"
               : "Total para venda"}
@@ -251,7 +250,7 @@ export default function TradeForm({
             required
             className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
           />
-          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-400 md:text-sm">
             Preço token na compra
           </p>
         </div>
@@ -266,7 +265,7 @@ export default function TradeForm({
               placeholder="$ USD"
               className="w-full border border-gray-600 px-2 py-1 text-[10px] text-white/70 sm:text-xs"
             />
-            <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
+            <p className="pt-1 text-[10px] text-blue-400 md:text-sm">
               Preço token na venda
             </p>
           </div>
@@ -276,7 +275,7 @@ export default function TradeForm({
           <div className="flex h-7 w-full items-center justify-center rounded-lg border border-gray-600 text-[10px] text-gray-400 sm:text-xs">
             {formData.amount ? `${formData.amount}` : "0"}
           </div>
-          <p className="pt-1 text-[10px] text-blue-600 md:text-sm">
+          <p className="pt-1 text-[10px] text-blue-400 md:text-sm">
             Quantidade
           </p>
         </div>

@@ -118,7 +118,6 @@ export function OperationPnlChart({
           const profit = Number(p.profit);
           const delta = Number(p.delta);
 
-          // 🔹 timestamp numérico (segundos desde epoch, UTC)
           const unixTime = Math.floor(
             new Date(p.time).getTime() / 1000,
           ) as UTCTimestamp;
@@ -242,24 +241,14 @@ export function OperationPnlChart({
         },
         mode: 1,
       },
-
-      // 🔥 AQUI: eixo X sempre usa o mesmo timeLabel do tooltip (BRT)
       localization: {
         timeFormatter: (time: Time): string => {
           if (typeof time === "number") {
             const ts = time as UTCTimestamp;
-
-            // procura o ponto correspondente
             const point = data.find((p) => p.unixTime === ts);
-            if (point) {
-              // já está em horário BR e 24h
-              return point.timeLabel;
-            }
-
-            // fallback caso não encontre (zoom longe etc.)
+            if (point) return point.timeLabel;
             return formatInTimeZone(ts * 1000, TIMEZONE, "HH:mm");
           }
-
           return String(time);
         },
       },
@@ -333,7 +322,6 @@ export function OperationPnlChart({
       }
 
       const logicalTime = param.time as UTCTimestamp;
-
       const hoveredPoint = data.find((p) => p.unixTime === logicalTime);
 
       const profitPoint = param.seriesData.get(profitSeries);
@@ -379,7 +367,7 @@ export function OperationPnlChart({
   // ================== ESTADOS ==================
   if (loading && !data.length) {
     return (
-      <div className="flex h-[70vh] w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-sm text-slate-300">
+      <div className="flex h-[50vh] w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-sm text-slate-300">
         Carregando gráfico de PnL...
       </div>
     );
@@ -387,7 +375,7 @@ export function OperationPnlChart({
 
   if (error) {
     return (
-      <div className="flex h-[70vh] w-full items-center justify-center rounded-xl border border-red-700 bg-slate-900/60 text-sm text-red-300">
+      <div className="flex h-[50vh] w-full items-center justify-center rounded-xl border border-red-700 bg-slate-900/60 text-sm text-red-300">
         Erro: {error}
       </div>
     );
@@ -395,14 +383,14 @@ export function OperationPnlChart({
 
   if (!data.length) {
     return (
-      <div className="flex h-[70vh] w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-sm text-slate-400">
+      <div className="flex h-[50vh] w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-sm text-slate-400">
         Sem dados de PnL para esse período.
       </div>
     );
   }
 
   return (
-    <div className="relative flex h-[70vh] w-full flex-col rounded-xl border border-slate-700 bg-gradient-to-b from-slate-900 to-slate-950 p-3">
+    <div className="relative flex w-full max-w-full flex-col rounded-xl border border-slate-700 bg-gradient-to-b from-slate-900 to-slate-950 p-3">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-100">
           {symbol} — Lucro x Preço
@@ -438,7 +426,17 @@ export function OperationPnlChart({
         </div>
       )}
 
-      <div ref={containerRef} className="mt-1 h-full w-full" />
+      {/* 👇 altura responsiva, respeitando sempre a largura disponível */}
+
+      <div
+        ref={containerRef}
+        className="mt-1 w-full"
+        style={{
+          // 100vh menos a altura aproximada do cabeçalho + formulário + filtros
+          // Ajusta esse 260 até ficar confortável na sua tela
+          height: "calc(100vh - 330px)",
+        }}
+      />
 
       {profitExtrema && (
         <div className="mt-3 grid gap-2 text-[11px] text-slate-300 sm:grid-cols-2">

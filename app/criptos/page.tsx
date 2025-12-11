@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import Navbar from "../_components/navbar";
 import TransactionContainer from "./_components/TransactionContainer";
 import { auth } from "@clerk/nextjs/server";
-import TradeFormTour from "./_components/TradeFormTour";
 
 export default async function Criptos() {
   const { userId } = auth();

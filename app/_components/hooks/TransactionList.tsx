@@ -111,20 +111,22 @@ export default function TransactionList({
 
   return (
     <div className="flex w-full flex-col">
-      <div className="bg-[#060D13]">
-        <TradeForm
-          onAddTransaction={(newTransaction) =>
-            setTransactions((prev) => [...prev, newTransaction])
-          }
-          onUpdateTransaction={handleUpdateTransaction}
-          transactionBeingEdited={transactionBeingEdited}
-          clearEditing={clearEditing}
-          tokenPrices={tokenPrices}
-          selectedToken={transactionBeingEdited?.token || selectedToken}
-          setSelectedToken={setSelectedToken}
-          tokens={tokens}
-        />
-      </div>
+      {filter !== "chart" && (
+        <div className="bg-[#060D13]">
+          <TradeForm
+            onAddTransaction={(newTransaction) =>
+              setTransactions((prev) => [...prev, newTransaction])
+            }
+            onUpdateTransaction={handleUpdateTransaction}
+            transactionBeingEdited={transactionBeingEdited}
+            clearEditing={clearEditing}
+            tokenPrices={tokenPrices}
+            selectedToken={transactionBeingEdited?.token || selectedToken}
+            setSelectedToken={setSelectedToken}
+            tokens={tokens}
+          />
+        </div>
+      )}
 
       <div className="sticky top-0 z-10 flex border-b border-gray-800 bg-[#060D13]">
         <TransactionFilterToggle value={filter} onChange={handleFilterChange} />

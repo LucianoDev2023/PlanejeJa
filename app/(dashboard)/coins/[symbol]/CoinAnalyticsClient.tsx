@@ -15,7 +15,7 @@ export function CoinAnalyticsClient({
   const [selectedSymbol, setSelectedSymbol] = useState(initialSymbol);
 
   return (
-    <main className="mx-auto flex w-full flex-col gap-4 p-4 text-slate-100">
+    <section className="mx-auto flex w-full max-w-full flex-col gap-4 overflow-x-hidden p-4 text-slate-100">
       <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
         <h1 className="text-xs font-bold">
           Análise de gráfica de operações abertas
@@ -47,7 +47,10 @@ export function CoinAnalyticsClient({
         </div>
       </div>
 
-      <OperationPnlChart symbol={selectedSymbol} autoRefreshMs={60_000} />
-    </main>
+      {/* 👇 ocupa toda a largura disponível, sem estourar */}
+      <div className="w-full max-w-full">
+        <OperationPnlChart symbol={selectedSymbol} autoRefreshMs={60_000} />
+      </div>
+    </section>
   );
 }

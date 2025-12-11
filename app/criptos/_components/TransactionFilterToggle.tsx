@@ -55,7 +55,7 @@ export default function TransactionFilterToggle({
           <button
             key={filter.value}
             onClick={() => onChange(filter.value)}
-            className={`relative z-10 flex items-center justify-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none transition-all duration-300 ${
+            className={`relative z-10 flex items-center justify-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none transition-all duration-300 md:text-xs xl:text-sm ${
               isActive ? "text-white" : "text-gray-500"
             }`}
           >
