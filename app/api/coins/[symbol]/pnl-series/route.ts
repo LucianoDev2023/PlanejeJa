@@ -25,12 +25,14 @@ export async function GET(
     const url = new URL(req.url);
     const searchParams = url.searchParams;
 
-    const hoursParam = searchParams.get("hours");
     const operationId = searchParams.get("operationId");
-    const hours = hoursParam ? Number(hoursParam) : 24;
+
+    const hoursParam = searchParams.get("hours");
+    const hours = hoursParam ? Number(hoursParam) : 24 * 30; // 720h
+
+    const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 
     const symbol = params.symbol.toUpperCase();
-    const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 
     // 1) Snapshots horários dessa moeda no período
     const snapshots = await prisma.priceSnapshot.findMany({
