@@ -15,7 +15,6 @@ node_modules
 # Docker
 Dockerfile
 docker-compose.yml
-
-# Outros
+# Outro
 npm-debug.log
 yarn-error.log
