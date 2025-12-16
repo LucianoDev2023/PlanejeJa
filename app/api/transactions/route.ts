@@ -45,9 +45,18 @@ export async function GET() {
     }
 
     const transactions = await prisma.cryptoTransaction.findMany({
-      where: { userId }, // 👈 busca apenas do usuário logado
+      where: { userId },
       orderBy: { date: "desc" },
     });
+
+    console.log(
+      transactions.map((t) => ({
+        id: t.id,
+        type: t.type,
+        profitSell: t.profitSell,
+        profitSellType: typeof t.profitSell,
+      })),
+    );
 
     return NextResponse.json(transactions);
   } catch (error) {

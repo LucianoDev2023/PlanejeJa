@@ -31,6 +31,20 @@ export default function TransactionList({
     tokens?.[0] || "BTC",
   );
 
+  const selectedSymbol = useMemo(() => {
+    return (transactionBeingEdited?.token || selectedToken)
+      .trim()
+      .toUpperCase();
+  }, [transactionBeingEdited, selectedToken]);
+
+  const totalInvestedActiveUsd = useMemo(() => {
+    return transactions
+      .filter((t) => t.type === "buy")
+      .filter((t) => t.profitSell === null) // compras ativas
+      .filter((t) => t.token?.trim().toUpperCase() === selectedSymbol)
+      .reduce((sum, t) => sum + (Number(t.usdValue) || 0), 0);
+  }, [transactions, selectedSymbol]);
+
   const [filter, setFilter] = useState<TransactionFilterValue>("all");
 
   const filteredTransactions = transactions.filter((t) => {
@@ -137,6 +151,8 @@ export default function TransactionList({
           <CoinAnalyticsClient
             availableSymbols={availableSymbols}
             initialSymbol={initialSymbol}
+            totalInvestedActiveBuys={totalInvestedActiveUsd}
+            onSymbolChange={(sym) => setSelectedToken(sym)}
           />
         </div>
       ) : loading ? (

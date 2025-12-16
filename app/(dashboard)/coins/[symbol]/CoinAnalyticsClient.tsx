@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OperationPnlChart } from "@/app/_components/OperationPnlChart";
 
 interface CoinAnalyticsClientProps {
   availableSymbols: string[];
   initialSymbol: string;
+  totalInvestedActiveBuys?: number;
+  onSymbolChange?: (symbol: string) => void;
 }
 
 export function CoinAnalyticsClient({
   availableSymbols,
   initialSymbol,
+  totalInvestedActiveBuys,
+  onSymbolChange,
 }: CoinAnalyticsClientProps) {
   const [selectedSymbol, setSelectedSymbol] = useState(initialSymbol);
+
+  useEffect(() => {
+    setSelectedSymbol(initialSymbol);
+    onSymbolChange?.(initialSymbol);
+  }, [initialSymbol, onSymbolChange]);
 
   return (
     <section className="mx-auto flex w-full max-w-full flex-col gap-4 overflow-x-hidden p-4 text-slate-100">
@@ -34,7 +43,8 @@ export function CoinAnalyticsClient({
             value={selectedSymbol}
             onChange={(e) => {
               const sym = e.target.value;
-              setSelectedSymbol(sym); // só troca o gráfico
+              setSelectedSymbol(sym);
+              onSymbolChange?.(sym); // ✅ sincroniza com TransactionList
             }}
             className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-100 shadow-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           >
@@ -49,7 +59,11 @@ export function CoinAnalyticsClient({
 
       {/* 👇 ocupa toda a largura disponível, sem estourar */}
       <div className="w-full max-w-full">
-        <OperationPnlChart symbol={selectedSymbol} autoRefreshMs={60_000} />
+        <OperationPnlChart
+          symbol={selectedSymbol}
+          autoRefreshMs={60_000}
+          totalInvestedActiveUsd={totalInvestedActiveBuys}
+        />
       </div>
     </section>
   );
