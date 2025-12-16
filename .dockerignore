@@ -1,20 +1,5 @@
-# Dependências e build
 node_modules
-.next
-
-# Git
-.git
-
-# Logs
-*.log
-
-# Variáveis de ambiente (NUNCA subir)
 .env
-.env.*
-
-# Docker
 Dockerfile
-docker-compose.yml
-# Outro
-npm-debug.log
-yarn-error.log
+.git
+*.log

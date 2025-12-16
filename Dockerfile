@@ -1,36 +1,21 @@
-# ---- deps ----
-FROM node:18-alpine AS deps
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-# ---- builder ----
+# Etapa 1: build
 FROM node:18-alpine AS builder
-WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
+WORKDIR /app
 COPY . .
 
-ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm install
 RUN npm run build
 
-# ---- runner ----
-FROM node:18-alpine AS runner
+# Etapa 2: imagem final
+FROM node:18-alpine
+
 WORKDIR /app
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# (opcional) segurança
-RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
-
-# Next standalone (inclui server.js + node_modules mínimos)
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-
-USER nextjs
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
