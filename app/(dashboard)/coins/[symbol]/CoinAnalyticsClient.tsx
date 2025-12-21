@@ -37,13 +37,12 @@ export function CoinAnalyticsClient({
   onSymbolChange,
 }: CoinAnalyticsClientProps) {
   const [selectedSymbol, setSelectedSymbol] = useState(initialSymbol);
+  const [period, setPeriod] = useState<PeriodOption>("7d");
 
-  // ✅ opcional: lista ordenada (fica mais “produto”)
   const symbols = useMemo(() => {
     return [...availableSymbols].sort((a, b) => a.localeCompare(b));
   }, [availableSymbols]);
 
-  // ✅ Ao abrir a página: tenta carregar o último símbolo salvo
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
 
@@ -53,92 +52,101 @@ export function CoinAnalyticsClient({
       return;
     }
 
-    // se não tiver salvo, usa o initialSymbol mesmo
     setSelectedSymbol(initialSymbol);
     onSymbolChange?.(initialSymbol);
   }, [initialSymbol, onSymbolChange, symbols]);
 
   const invested = totalInvestedActiveBuys ?? 0;
 
-  const [period, setPeriod] = useState<PeriodOption>("7d");
-
   return (
-    <section className="mx-auto flex w-full max-w-full flex-col gap-4 overflow-x-hidden p-4 text-slate-100">
-      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xs font-bold">
-            Análise de gráfica de operações abertas
+    <section className="mx-auto w-full max-w-full overflow-x-hidden px-3 py-3 text-slate-100 sm:px-4 sm:py-4 lg:px-6 lg:py-5">
+      <div className="flex flex-col gap-3 sm:gap-4">
+        {/* HEADER */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-base font-semibold tracking-tight sm:text-lg">
+            Operações abertas — Dashboard
           </h1>
 
-          {/* ✅ Badge simples mostrando investido */}
           {invested > 0 && (
-            <span className="rounded-full border border-slate-700 bg-slate-950/60 px-2 py-1 text-[10px] text-slate-300">
-              Investido:{" "}
-              <span className="font-semibold">{formatUsd(invested)}</span>
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-slate-200/90 backdrop-blur-xl">
+                <span className="text-slate-300">Investido:</span>
+                <span className="font-semibold text-slate-100">
+                  {formatUsd(invested)}
+                </span>
+              </span>
+            </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="symbol-select"
-            className="text-xs font-medium text-slate-300"
-          >
-            Selecionar moeda:
-          </label>
-
-          <select
-            id="symbol-select"
-            value={selectedSymbol}
-            onChange={(e) => {
-              const sym = e.target.value;
-
-              setSelectedSymbol(sym);
-
-              // ✅ salva no navegador
-              localStorage.setItem(STORAGE_KEY, sym);
-
-              // ✅ avisa o pai (TransactionList etc)
-              onSymbolChange?.(sym);
-            }}
-            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-100 shadow-sm outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
-          >
-            {symbols.map((sym) => (
-              <option key={sym} value={sym}>
-                {sym}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {(["1h", "1d", "7d", "30d"] as PeriodOption[]).map((p) => {
-          const isActive = period === p;
-
-          return (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-all duration-200 ${
-                isActive
-                  ? "border border-cyan-400/30 bg-cyan-500/10 text-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
-                  : "bg-slate-800/60 text-slate-300 hover:bg-slate-700/60 hover:text-slate-200"
-              }`}
+        {/* TOOLBAR (uma linha) */}
+        <div className="flex w-full items-center gap-2 overflow-x-auto pb-1">
+          {/* Select compacto */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="symbol-select"
+              className="text-[10px] font-medium text-slate-400"
             >
-              {p.toUpperCase()}
-            </button>
-          );
-        })}
-      </div>
+              Moeda
+            </label>
 
-      <div className="w-full max-w-full">
-        <OperationPnlChart
-          symbol={selectedSymbol}
-          autoRefreshMs={60_000}
-          totalInvestedActiveUsd={invested}
-          hours={PERIOD_TO_HOURS[period]}
-        />
+            <select
+              id="symbol-select"
+              value={selectedSymbol}
+              onChange={(e) => {
+                const sym = e.target.value;
+                setSelectedSymbol(sym);
+                localStorage.setItem(STORAGE_KEY, sym);
+                onSymbolChange?.(sym);
+              }}
+              className="h-8 min-w-[96px] rounded-lg border border-white/10 bg-white/5 px-2 text-xs text-slate-100 outline-none backdrop-blur-xl focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/20"
+            >
+              {symbols.map((sym) => (
+                <option key={sym} value={sym}>
+                  {sym}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Períodos pequenos (inline) */}
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-medium text-slate-400">
+              Período
+            </span>
+
+            <div className="flex items-center gap-2">
+              {(["1h", "1d", "7d", "30d"] as PeriodOption[]).map((p) => {
+                const isActive = period === p;
+
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPeriod(p)}
+                    className={`h-8 min-w-[44px] whitespace-nowrap rounded-lg border px-2 text-[11px] font-semibold uppercase transition-all ${
+                      isActive
+                        ? "border-cyan-400/30 bg-cyan-500/15 text-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.18)]"
+                        : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-slate-100"
+                    } `}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* CHART */}
+        <div className="w-full max-w-full">
+          <OperationPnlChart
+            symbol={selectedSymbol}
+            autoRefreshMs={60_000}
+            totalInvestedActiveUsd={invested}
+            hours={PERIOD_TO_HOURS[period]}
+          />
+        </div>
       </div>
     </section>
   );
