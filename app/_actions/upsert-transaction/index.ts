@@ -1,40 +1,27 @@
 "use server";
 
-import { db } from "@/app/_lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import {
-  TransactionCategory,
-  TransactionPaymentMethod,
-  TransactionType,
-} from "@prisma/client";
-import { upsertTransactionSchema } from "./schema";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
-interface UpsertTransactionParams {
-  id?: string;
-  name: string;
-  amount: number;
-  type: TransactionType;
-  category: TransactionCategory;
-  paymentMethod: TransactionPaymentMethod;
-  date: Date;
-  installments?: number; // Novo campo
-  valuePerInstallment?: number; // Novo campo
-}
+import { upsertTransaction } from "@/app/_server/transactions/upsert-transaction";
+import { upsertTransactionSchema } from "@/app/_server/transactions/schema";
 
-export const upsertTransaction = async (params: UpsertTransactionParams) => {
-  upsertTransactionSchema.parse(params);
+export async function upsertTransactionAction(raw: unknown) {
+  const parsed = upsertTransactionSchema.parse(raw);
+
   const { userId } = await auth();
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
+  if (!userId) throw new Error("Unauthorized");
 
-  await db.transaction.upsert({
-    where: {
-      id: params?.id ?? "",
-    },
-    update: { ...params, userId },
-    create: { ...params, userId },
+  const date =
+    parsed.date instanceof Date ? parsed.date : new Date(parsed.date);
+
+  await upsertTransaction({
+    ...parsed,
+    date,
+    userId,
   });
+
+  revalidateTag("dashboard");
+  revalidatePath("/");
   revalidatePath("/transactions");
-};
+}

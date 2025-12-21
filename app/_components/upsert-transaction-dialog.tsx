@@ -40,9 +40,10 @@ import {
 } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { upsertTransaction } from "../_actions/upsert-transaction";
+
 import { useState } from "react";
 import { ScrollArea } from "./ui/scroll-area";
+import { upsertTransactionAction } from "../_actions/upsert-transaction";
 
 interface UpsertTransactionDialogProps {
   isOpen: boolean;
@@ -167,7 +168,7 @@ const UpsertTransactionDialog = ({
       // Garante que o valor do amount tenha duas casas decimais
       const formattedAmount = amount.toFixed(2);
 
-      await upsertTransaction({
+      await upsertTransactionAction({
         ...data,
         amount: parseFloat(formattedAmount),
         id: transactionId,

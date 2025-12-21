@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   createChart,
   ColorType,
@@ -17,19 +17,10 @@ import {
 } from "lightweight-charts";
 import { formatInTimeZone } from "date-fns-tz";
 
-interface PnlPoint {
-  time: string; // ISO UTC
-  unixTime: UTCTimestamp;
-  timeLabel: string; // BRT label
-  price: number;
-  profit: number; // lucro em USD (mesma unidade do investido)
-  delta: number;
-}
-
 interface ApiReturnPoint {
-  time: string;
+  time: string; // ISO UTC
   price: number;
-  profit: number;
+  profit: number; // USD
   delta: number;
 }
 
@@ -39,9 +30,19 @@ interface PnlSeriesResponse {
 
 interface OperationPnlChartProps {
   symbol: string;
-  operationId?: string;
+  operationId?: string; // ✅ agora existe
   autoRefreshMs?: number;
   totalInvestedActiveUsd?: number;
+  hours?: number; // ✅ agora existe
+}
+
+interface PnlPoint {
+  time: string;
+  unixTime: UTCTimestamp;
+  timeLabel: string;
+  price: number;
+  profit: number;
+  delta: number;
 }
 
 interface HoverInfo {
@@ -53,6 +54,11 @@ interface HoverInfo {
 const TIMEZONE = "America/Sao_Paulo";
 const TIME_LABEL_FORMAT = "dd/MM HH:mm";
 const SUMMARY_TIME_FORMAT = "dd/MM/yyyy HH:mm";
+
+function safeNumber(v: unknown): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
 
 const formatCurrency = (value: number): string =>
   new Intl.NumberFormat("en-US", {
@@ -68,63 +74,107 @@ const formatTokenPrice = (value: number): string => {
   return num < 1 ? num.toFixed(6) : num.toFixed(2);
 };
 
-function createBaseChartOptions(): DeepPartial<ChartOptions> {
+// ========================== UI bits ==========================
+function KpiPill({
+  label,
+  value,
+  valueClass = "text-slate-100",
+}: {
+  label: string;
+  value: string;
+  valueClass?: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+      <div className="text-[10px] uppercase tracking-wide text-slate-400">
+        {label}
+      </div>
+      <div className={`text-sm font-semibold ${valueClass}`}>{value}</div>
+    </div>
+  );
+}
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-slate-200/80 backdrop-blur-xl">
+      {children}
+    </span>
+  );
+}
+
+function createNeonChartOptions(): DeepPartial<ChartOptions> {
   return {
     layout: {
       background: { type: ColorType.Solid, color: "transparent" },
-      textColor: "rgba(226,232,240,0.85)",
+      textColor: "rgba(255,255,255,0.78)",
       fontFamily:
         'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
-      fontSize: 12,
+      fontSize: 11,
     },
     grid: {
-      vertLines: { color: "rgba(148,163,184,0.06)" },
-      horzLines: { color: "rgba(148,163,184,0.06)" },
+      vertLines: { color: "rgba(255,255,255,0.04)" },
+      horzLines: { color: "rgba(255,255,255,0.04)" },
     },
     crosshair: {
       mode: 1,
-      vertLine: { color: "rgba(148,163,184,0.25)", width: 1, style: 2 },
-      horzLine: { color: "rgba(148,163,184,0.25)", width: 1, style: 2 },
+      vertLine: { color: "rgba(255,255,255,0.18)", width: 1, style: 2 },
+      horzLine: { color: "rgba(255,255,255,0.18)", width: 1, style: 2 },
     },
     timeScale: {
       borderVisible: false,
       timeVisible: true,
       secondsVisible: false,
-      rightOffset: 3,
-      barSpacing: 10,
+      rightOffset: 2,
+      barSpacing: 7,
       fixLeftEdge: true,
-      lockVisibleTimeRangeOnResize: true,
+      lockVisibleTimeRangeOnResize: false,
     },
     rightPriceScale: {
       borderVisible: false,
-      scaleMargins: {
-        top: 0.25,
-        bottom: 0.18,
-      },
+      scaleMargins: { top: 0.25, bottom: 0.18 },
     },
   };
 }
 
-function safeNumber(v: unknown): number {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
+// ============================================================
 
 export function OperationPnlChart({
   symbol,
   operationId,
   autoRefreshMs = 60_000,
   totalInvestedActiveUsd = 0,
+  hours,
 }: OperationPnlChartProps) {
   const [data, setData] = useState<PnlPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const chartRef = useRef<IChartApi | null>(null);
-  const investedContainerRef = useRef<HTMLDivElement | null>(null);
-  const investedChartRef = useRef<IChartApi | null>(null);
+  // toggles (produto)
+  const [showEquityPanel, setShowEquityPanel] = useState(true);
+
+  // DOM refs
+  const mainContainerRef = useRef<HTMLDivElement | null>(null);
+  const equityContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Chart refs
+  const mainChartRef = useRef<IChartApi | null>(null);
+  const equityChartRef = useRef<IChartApi | null>(null);
+
+  // Series refs (pra não recriar chart a cada update)
+  const profitSeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
+  const priceSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+
+  const investedSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const equitySeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+
+  // Map O(1) p/ tooltip
+  const pointByTime = useMemo(() => {
+    const m = new Map<number, PnlPoint>();
+    for (const p of data) m.set(p.unixTime as number, p);
+    return m;
+  }, [data]);
 
   // ================== FETCH + POLLING ==================
   useEffect(() => {
@@ -139,14 +189,13 @@ export function OperationPnlChart({
         setError(null);
 
         const params = new URLSearchParams();
+
         if (operationId) params.set("operationId", operationId);
+        if (hours) params.set("hours", String(hours));
 
         const res = await fetch(
           `/api/coins/${symbol}/pnl-series?${params.toString()}`,
-          {
-            cache: "no-store",
-            signal: abortController.signal,
-          },
+          { cache: "no-store", signal: abortController.signal },
         );
 
         const json = (await res.json().catch(() => undefined)) as
@@ -177,10 +226,10 @@ export function OperationPnlChart({
         });
 
         setData(formatted);
+        setLastUpdatedAt(new Date());
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return;
-        if (err instanceof Error) setError(err.message);
-        else setError("Erro ao carregar dados");
+        setError(err instanceof Error ? err.message : "Erro ao carregar dados");
       } finally {
         setLoading(false);
       }
@@ -200,9 +249,27 @@ export function OperationPnlChart({
       abortController.abort();
       if (intervalId) window.clearInterval(intervalId);
     };
-  }, [symbol, operationId, autoRefreshMs]);
+  }, [symbol, operationId, autoRefreshMs, hours]);
 
   // ================== DERIVADOS (KPIs) ==================
+  const lastPoint = data.length ? data[data.length - 1] : null;
+
+  const invested = useMemo(
+    () => safeNumber(totalInvestedActiveUsd),
+    [totalInvestedActiveUsd],
+  );
+  const lastProfit = useMemo(() => safeNumber(lastPoint?.profit), [lastPoint]);
+  const lastPrice = useMemo(() => safeNumber(lastPoint?.price), [lastPoint]);
+
+  const equityNow = useMemo(() => {
+    if (!Number.isFinite(invested) || !Number.isFinite(lastProfit)) {
+      return invested;
+    }
+    return invested + lastProfit;
+  }, [invested, lastProfit]);
+
+  const roiPct = invested > 0 ? (lastProfit / invested) * 100 : 0;
+
   const profitExtrema = useMemo(() => {
     if (!data.length) return null;
 
@@ -234,417 +301,512 @@ export function OperationPnlChart({
     };
   }, [data]);
 
-  const lastPoint = data.length ? data[data.length - 1] : null;
+  const profitColor = lastProfit >= 0 ? "text-emerald-300" : "text-red-300";
+  const equityColor =
+    equityNow >= invested ? "text-emerald-300" : "text-red-300";
+  const roiColor = roiPct >= 0 ? "text-emerald-300" : "text-red-300";
 
-  const invested = useMemo(
-    () => safeNumber(totalInvestedActiveUsd),
-    [totalInvestedActiveUsd],
-  );
-  const lastProfit = useMemo(() => safeNumber(lastPoint?.profit), [lastPoint]);
-  const equityNow = invested + lastProfit;
-  const roiPct = invested > 0 ? (lastProfit / invested) * 100 : 0;
-
-  // ================== CHART PRINCIPAL (Lucro x Preço) ==================
+  // ================== INIT Chart Principal (uma vez) ==================
   useEffect(() => {
-    if (!containerRef.current) return;
-    if (!data.length) return;
+    if (!mainContainerRef.current) return;
+    if (mainChartRef.current) return;
 
-    // cleanup anterior
-    if (chartRef.current) {
-      chartRef.current.remove();
-      chartRef.current = null;
-    }
-
-    const el = containerRef.current;
-    const { clientWidth, clientHeight } = el;
-
-    const base = createBaseChartOptions();
+    const el = mainContainerRef.current;
+    const base = createNeonChartOptions();
 
     const chart = createChart(el, {
-      width: clientWidth,
-      height: clientHeight,
+      width: el.clientWidth,
+      height: el.clientHeight || 420,
       ...base,
-      // dois eixos (lucro à esquerda, preço à direita)
-      rightPriceScale: {
-        ...(base.rightPriceScale ?? {}),
-        visible: true,
-      },
+      rightPriceScale: { ...(base.rightPriceScale ?? {}), visible: true },
       leftPriceScale: {
         visible: true,
         borderVisible: false,
-        scaleMargins: { top: 0.25, bottom: 0.18 },
+        scaleMargins: { top: 0.26, bottom: 0.16 },
       },
       localization: {
         timeFormatter: (time: Time): string => {
           if (typeof time === "number") {
             const ts = time as UTCTimestamp;
-            const point = data.find((p) => p.unixTime === ts);
-            if (point) return point.timeLabel;
-            return formatInTimeZone(ts * 1000, TIMEZONE, "HH:mm");
+            const p = pointByTime.get(ts as number);
+            if (p) return p.timeLabel;
+            return formatInTimeZone((ts as number) * 1000, TIMEZONE, "HH:mm");
           }
           return String(time);
         },
       },
     });
 
-    chartRef.current = chart;
+    mainChartRef.current = chart;
 
-    const lastProfitLocal = data[data.length - 1].profit;
-    const isProfitPositive = lastProfitLocal >= 0;
-
-    const lastPrice = data[data.length - 1].price;
-    const pricePrecision = lastPrice < 1 ? 6 : 2;
-    const priceMinMove = lastPrice < 1 ? 0.000001 : 0.01;
-
-    const profitLineColor = isProfitPositive ? "#22c55e" : "#ef4444";
-    const profitTopColor = isProfitPositive
-      ? "rgba(34,197,94,0.28)"
-      : "rgba(239,68,68,0.28)";
-    const profitBottomColor = "rgba(2,6,23,0.02)";
-
+    // Séries
     const profitSeries = chart.addSeries(AreaSeries, {
       priceScaleId: "left",
-      lineColor: profitLineColor,
-      topColor: profitTopColor,
-      bottomColor: profitBottomColor,
       lineWidth: 1,
+      lineColor: "#22c55e",
+      topColor: "rgba(34,197,94,0.25)",
+      bottomColor: "rgba(2,6,23,0.02)",
     }) as ISeriesApi<"Area">;
 
     const priceSeries = chart.addSeries(LineSeries, {
       priceScaleId: "right",
-      color: "#60a5fa",
       lineWidth: 1,
+      color: "rgba(96,165,250,0.95)",
       lastValueVisible: true,
       priceLineVisible: true,
       crosshairMarkerVisible: true,
-      priceFormat: {
-        type: "price",
-        precision: pricePrecision,
-        minMove: priceMinMove,
-      },
+      priceFormat: { type: "price", precision: 2, minMove: 0.01 },
     }) as ISeriesApi<"Line">;
+
+    profitSeriesRef.current = profitSeries;
+    priceSeriesRef.current = priceSeries;
+
+    // Resize
+    const ro = new ResizeObserver(() => {
+      if (!mainContainerRef.current || !mainChartRef.current) return;
+      mainChartRef.current.applyOptions({
+        width: mainContainerRef.current.clientWidth,
+        height: mainContainerRef.current.clientHeight || 420,
+      });
+    });
+
+    ro.observe(el);
+
+    return () => {
+      ro.disconnect();
+      chart.remove();
+      mainChartRef.current = null;
+      profitSeriesRef.current = null;
+      priceSeriesRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pointByTime]);
+
+  // ================== UPDATE Chart Principal (quando data muda) ==================
+  useEffect(() => {
+    if (
+      !mainChartRef.current ||
+      !profitSeriesRef.current ||
+      !priceSeriesRef.current
+    )
+      return;
+    if (!data.length) return;
+
+    // Profit color dinâmica
+    const isProfitPositive = data[data.length - 1].profit >= 0;
+
+    profitSeriesRef.current.applyOptions({
+      lineColor: isProfitPositive ? "#22c55e" : "#ef4444",
+      topColor: isProfitPositive
+        ? "rgba(34,197,94,0.25)"
+        : "rgba(239,68,68,0.25)",
+      bottomColor: "rgba(2,6,23,0.02)",
+    });
+
+    // Preço com precision dinâmica
+    const lp = data[data.length - 1].price;
+    const precision = lp < 1 ? 6 : 2;
+    const minMove = lp < 1 ? 0.000001 : 0.01;
+
+    priceSeriesRef.current.applyOptions({
+      priceFormat: { type: "price", precision, minMove },
+    });
 
     const profitData: LineData[] = data.map((p) => ({
       time: p.unixTime,
       value: p.profit,
     }));
-
     const priceData: LineData[] = data.map((p) => ({
       time: p.unixTime,
       value: p.price,
     }));
 
-    profitSeries.setData(profitData);
-    priceSeries.setData(priceData);
+    profitSeriesRef.current.setData(profitData);
+    priceSeriesRef.current.setData(priceData);
 
-    chart.timeScale().fitContent();
+    mainChartRef.current.timeScale().fitContent();
+  }, [data]);
 
-    // Tooltip (crosshair)
-    const crosshairHandler = (param: MouseEventParams): void => {
-      if (param.time === undefined) {
+  // ================== Tooltip premium ==================
+  const onCrosshairMove = useCallback(
+    (param: MouseEventParams) => {
+      if (!param.time || !profitSeriesRef.current || !priceSeriesRef.current) {
         setHoverInfo(null);
         return;
       }
 
-      const logicalTime = param.time as UTCTimestamp;
-      const hoveredPoint = data.find((p) => p.unixTime === logicalTime);
+      const ts = param.time as UTCTimestamp;
+      const point = pointByTime.get(ts as number);
 
-      const profitPoint = param.seriesData.get(profitSeries);
-      const pricePoint = param.seriesData.get(priceSeries);
+      const profitPoint = param.seriesData.get(profitSeriesRef.current);
+      const pricePoint = param.seriesData.get(priceSeriesRef.current);
 
       const profitValue =
         profitPoint && "value" in profitPoint
           ? Number(profitPoint.value)
           : null;
-
       const priceValue =
         pricePoint && "value" in pricePoint ? Number(pricePoint.value) : null;
 
       setHoverInfo({
         timeLabel:
-          hoveredPoint?.timeLabel ??
-          formatInTimeZone(logicalTime * 1000, TIMEZONE, TIME_LABEL_FORMAT),
+          point?.timeLabel ??
+          formatInTimeZone((ts as number) * 1000, TIMEZONE, TIME_LABEL_FORMAT),
         price: priceValue,
         profit: profitValue,
       });
-    };
+    },
+    [pointByTime],
+  );
 
-    chart.subscribeCrosshairMove(crosshairHandler);
-
-    // resize
-    const ro = new ResizeObserver(() => {
-      if (!containerRef.current || !chartRef.current) return;
-      const { clientWidth: w, clientHeight: h } = containerRef.current;
-      chartRef.current.applyOptions({ width: w, height: h });
-    });
-
-    ro.observe(containerRef.current);
-
-    return () => {
-      chart.unsubscribeCrosshairMove(crosshairHandler);
-      ro.disconnect();
-      if (chartRef.current) {
-        chartRef.current.remove();
-        chartRef.current = null;
-      }
-    };
-  }, [data]);
-
-  // ================== CHART 2 (Investido x Valor Atual) ==================
   useEffect(() => {
-    if (!investedContainerRef.current) return;
-    if (!data.length) return;
+    if (!mainChartRef.current) return;
+    const chart = mainChartRef.current;
 
-    if (investedChartRef.current) {
-      investedChartRef.current.remove();
-      investedChartRef.current = null;
-    }
+    chart.subscribeCrosshairMove(onCrosshairMove);
+    return () => chart.unsubscribeCrosshairMove(onCrosshairMove);
+  }, [onCrosshairMove]);
 
-    const el = investedContainerRef.current;
-    const { clientWidth } = el;
+  // ================== INIT Equity chart (uma vez) ==================
+  useEffect(() => {
+    if (!equityContainerRef.current) return;
+    if (equityChartRef.current) return;
 
-    const base = createBaseChartOptions();
+    const el = equityContainerRef.current;
+    const base = createNeonChartOptions();
 
     const chart = createChart(el, {
-      width: clientWidth,
-      height: 220,
+      width: el.clientWidth,
+      height: el.clientHeight || 170,
       ...base,
       rightPriceScale: {
         ...(base.rightPriceScale ?? {}),
         visible: true,
-        scaleMargins: { top: 0.22, bottom: 0.14 },
+        scaleMargins: { top: 0.25, bottom: 0.18 },
       },
-      // este chart não precisa do eixo esquerdo
     });
 
-    investedChartRef.current = chart;
+    equityChartRef.current = chart;
 
     const investedSeries = chart.addSeries(LineSeries, {
       lineWidth: 1,
-      color: "rgba(148,163,184,0.65)",
-      lineStyle: 2, // dashed
+      color: "rgba(148,163,184,0.70)",
+      lineStyle: 2,
       lastValueVisible: false,
       priceLineVisible: false,
       crosshairMarkerVisible: false,
     }) as ISeriesApi<"Line">;
 
-    const equityPositive = invested + (data.at(-1)?.profit ?? 0) >= invested;
-
     const equitySeries = chart.addSeries(LineSeries, {
       lineWidth: 1,
-      color: equityPositive ? "#22c55e" : "#ef4444",
+      color: "#22c55e",
       lastValueVisible: true,
       priceLineVisible: true,
       crosshairMarkerVisible: true,
     }) as ISeriesApi<"Line">;
 
+    investedSeriesRef.current = investedSeries;
+    equitySeriesRef.current = equitySeries;
+
+    const ro = new ResizeObserver(() => {
+      if (!equityContainerRef.current || !equityChartRef.current) return;
+      equityChartRef.current.applyOptions({
+        width: equityContainerRef.current.clientWidth,
+        height: equityContainerRef.current.clientHeight || 170,
+      });
+    });
+
+    ro.observe(el);
+
+    return () => {
+      ro.disconnect();
+      chart.remove();
+      equityChartRef.current = null;
+      investedSeriesRef.current = null;
+      equitySeriesRef.current = null;
+    };
+  }, []);
+
+  // ================== UPDATE Equity chart ==================
+  useEffect(() => {
+    if (
+      !equityChartRef.current ||
+      !investedSeriesRef.current ||
+      !equitySeriesRef.current
+    )
+      return;
+    if (!data.length) return;
+
+    const equityPositive =
+      invested + (data[data.length - 1]?.profit ?? 0) >= invested;
+
+    equitySeriesRef.current.applyOptions({
+      color: equityPositive ? "#22c55e" : "#ef4444",
+    });
+
     const investedData: LineData[] = data.map((p) => ({
       time: p.unixTime,
       value: invested,
     }));
-
     const equityData: LineData[] = data.map((p) => ({
       time: p.unixTime,
       value: invested + p.profit,
     }));
 
-    investedSeries.setData(investedData);
-    equitySeries.setData(equityData);
+    investedSeriesRef.current.setData(investedData);
+    equitySeriesRef.current.setData(equityData);
 
-    chart.timeScale().fitContent();
-
-    const ro = new ResizeObserver(() => {
-      if (!investedContainerRef.current || !investedChartRef.current) return;
-      investedChartRef.current.applyOptions({
-        width: investedContainerRef.current.clientWidth,
-        height: 220,
-      });
-    });
-
-    ro.observe(investedContainerRef.current);
-
-    return () => {
-      ro.disconnect();
-      if (investedChartRef.current) {
-        investedChartRef.current.remove();
-        investedChartRef.current = null;
-      }
-    };
+    equityChartRef.current.timeScale().fitContent();
   }, [data, invested]);
 
-  // ================== ESTADOS ==================
+  // ================== States ==================
   if (loading && !data.length) {
     return (
-      <div className="flex h-[50vh] w-[50vh] items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/60 p-6 text-sm text-slate-300">
-        Carregando gráfico...
+      <div className="w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 w-40 rounded bg-white/10" />
+          <div className="h-3 w-72 rounded bg-white/10" />
+          <div className="mt-4 h-[420px] rounded-2xl bg-white/5" />
+          <div className="h-3 w-56 rounded bg-white/10" />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-[50vh] w-full items-center justify-center rounded-2xl border border-red-900/60 bg-slate-950/60 p-6 text-sm text-red-300">
-        Erro: {error}
+      <div className="w-full overflow-hidden rounded-3xl border border-red-500/20 bg-gradient-to-b from-red-500/10 to-white/[0.02] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+        <div className="text-sm text-red-200">Erro: {error}</div>
+        <button
+          className="mt-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-100 hover:bg-white/10"
+          onClick={() => {
+            setError(null);
+            setData([]);
+          }}
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
 
   if (!data.length) {
     return (
-      <div className="flex h-[50vh] w-full items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/60 p-6 text-sm text-slate-400">
-        Sem dados para esse período.
+      <div className="w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+        <div className="text-sm text-slate-300">
+          Sem dados para esse período.
+        </div>
       </div>
     );
   }
 
-  const profitColorClass =
-    lastProfit >= 0 ? "text-emerald-400" : "text-red-400";
-  const equityColorClass =
-    equityNow >= invested ? "text-emerald-400" : "text-red-400";
-  const roiColorClass = roiPct >= 0 ? "text-emerald-400" : "text-red-400";
+  const tooltipProfit = hoverInfo?.profit ?? null;
+  const tooltipPrice = hoverInfo?.price ?? null;
 
   return (
-    <div className="relative w-full rounded-2xl border border-slate-800 bg-slate-950/60 p-6">
-      {/* Header */}
-      <div className="mb-3 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div>
-          <h3 className="text-sm font-semibold text-slate-100">
-            {symbol} — Lucro x Preço
-          </h3>
-          <p className="mt-0.5 text-[11px] text-slate-400">
-            Crosshair para detalhes • Horário em {TIMEZONE}
-          </p>
-        </div>
+    <div className="from-white/6 relative w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b to-white/[0.02] shadow-[0_20px_70px_rgba(0,0,0,0.65)] backdrop-blur-2xl">
+      {/* Neon glows */}
+      <div className="bg-emerald-500/12 pointer-events-none absolute -right-28 -top-28 h-72 w-72 rounded-full blur-3xl" />
+      <div className="bg-sky-500/12 pointer-events-none absolute -bottom-36 -left-32 h-80 w-80 rounded-full blur-3xl" />
+      <div className="bg-fuchsia-500/8 pointer-events-none absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full blur-3xl" />
 
-        {/* KPIs */}
-        <div className="grid w-full gap-2 sm:grid-cols-3 md:w-auto">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2">
-            <div className="text-[10px] text-slate-400">Investido (ativo)</div>
-            <div className="text-sm font-semibold text-slate-100">
-              {formatCurrency(invested)}
-            </div>
-          </div>
+      <div className="relative p-5 sm:p-6">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Chip>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                {symbol}
+              </Chip>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2">
-            <div className="text-[10px] text-slate-400">
-              Valor atual (estimado)
-            </div>
-            <div className={`text-sm font-semibold ${equityColorClass}`}>
-              {formatCurrency(equityNow)}
-            </div>
-          </div>
+              <Chip>PnL x Price</Chip>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2">
-            <div className="text-[10px] text-slate-400">ROI (atual)</div>
-            <div className={`text-sm font-semibold ${roiColorClass}`}>
-              {invested > 0 ? `${roiPct.toFixed(2)}%` : "-"}
+              {lastUpdatedAt && (
+                <Chip>
+                  Atualizado{" "}
+                  {formatInTimeZone(lastUpdatedAt, TIMEZONE, "HH:mm:ss")}
+                </Chip>
+              )}
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Tooltip */}
-      {hoverInfo && (
-        <div className="pointer-events-none absolute right-3 top-3 z-10 rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2 text-[11px] text-slate-100 shadow-lg backdrop-blur">
-          <div className="mb-1 text-[10px] text-slate-400">
-            {hoverInfo.timeLabel}
-          </div>
-          {hoverInfo.price !== null && (
-            <div>
-              Preço:{" "}
-              <span className="font-semibold text-slate-100">
-                ${formatTokenPrice(hoverInfo.price)}
+            <h3 className="text-base font-semibold tracking-tight text-slate-100">
+              Operações abertas — Dashboard
+            </h3>
+
+            <div className="text-xs text-slate-400">
+              Preço atual:{" "}
+              <span className="font-semibold text-slate-200">
+                ${formatTokenPrice(lastPrice)}
+              </span>{" "}
+              • Lucro atual:{" "}
+              <span className={`font-semibold ${profitColor}`}>
+                {formatCurrency(lastProfit)}
               </span>
             </div>
-          )}
-          {hoverInfo.profit !== null && (
-            <div>
-              Lucro:{" "}
-              <span
-                className={
-                  hoverInfo.profit >= 0 ? "text-emerald-400" : "text-red-400"
-                }
-              >
-                {formatCurrency(hoverInfo.profit)}
+          </div>
+
+          {/* KPIs */}
+          <div className="grid w-full gap-2 sm:grid-cols-3 md:w-auto">
+            <KpiPill label="Investido" value={formatCurrency(invested)} />
+            <KpiPill
+              label="Valor atual"
+              value={formatCurrency(equityNow)}
+              valueClass={equityColor}
+            />
+            <KpiPill
+              label="ROI"
+              value={invested > 0 ? `${roiPct.toFixed(2)}%` : "-"}
+              valueClass={roiColor}
+            />
+          </div>
+        </div>
+
+        {/* Toolbar */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-[11px] text-slate-300">
+            <span className="inline-flex items-center gap-2">
+              <span className="h-[2px] w-5 rounded bg-emerald-400/80" />
+              PnL
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="h-[2px] w-5 rounded bg-sky-400/80" />
+              Preço
+            </span>
+          </div>
+
+          <button
+            className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-100 hover:bg-white/10"
+            onClick={() => setShowEquityPanel((v) => !v)}
+          >
+            {showEquityPanel ? "Ocultar Equity" : "Mostrar Equity"}
+          </button>
+        </div>
+
+        {/* Tooltip premium */}
+        {hoverInfo && (
+          <div className="pointer-events-none absolute right-5 top-5 z-10 w-[200px] rounded-2xl border border-white/10 bg-black/40 p-3 text-[11px] text-slate-100 shadow-xl backdrop-blur-2xl">
+            <div className="mb-2 text-[10px] text-slate-300">
+              {hoverInfo.timeLabel}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400">Preço</span>
+              <span className="font-semibold">
+                {tooltipPrice == null
+                  ? "-"
+                  : `$${formatTokenPrice(tooltipPrice)}`}
               </span>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Chart 1 */}
-      <div
-        ref={containerRef}
-        className="mt-2 w-full overflow-hidden rounded-xl px-2 sm:px-4 lg:px-6"
-        style={{
-          height: "min(560px, calc(100vh - 420px))",
-        }}
-      />
-
-      {/* Extremos */}
-      {profitExtrema && (
-        <div className="mt-3 grid gap-2 text-[11px] text-slate-300 sm:grid-cols-2">
-          <div>
-            <span className="font-semibold text-emerald-400">
-              Lucro máximo:
-            </span>{" "}
-            <span>{formatCurrency(profitExtrema.max.value)}</span>{" "}
-            <span className="text-slate-500">
-              em {profitExtrema.max.timeLabel}
-            </span>
-          </div>
-          <div>
-            <span className="font-semibold text-red-400">Lucro mínimo:</span>{" "}
-            <span>{formatCurrency(profitExtrema.min.value)}</span>{" "}
-            <span className="text-slate-500">
-              em {profitExtrema.min.timeLabel}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Chart 2 */}
-      <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/30 p-3">
-        <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="text-xs font-semibold text-slate-100">
-              Investido x Valor atual (estimado)
-            </div>
-            <div className="mt-0.5 text-[11px] text-slate-400">
-              Linha tracejada: investido • Linha sólida: valor atual
-            </div>
-          </div>
-
-          {/* Legend */}
-          <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-[2px] w-5 rounded bg-slate-400/60" />
-              Investido
-            </span>
-            <span className="inline-flex items-center gap-2">
+            <div className="mt-1 flex items-center justify-between">
+              <span className="text-slate-400">Lucro</span>
               <span
-                className={`h-[2px] w-5 rounded ${
-                  equityNow >= invested ? "bg-emerald-500" : "bg-red-500"
+                className={`font-semibold ${
+                  (tooltipProfit ?? 0) >= 0
+                    ? "text-emerald-300"
+                    : "text-red-300"
                 }`}
-              />
-              Valor atual
-            </span>
+              >
+                {tooltipProfit == null ? "-" : formatCurrency(tooltipProfit)}
+              </span>
+            </div>
           </div>
+        )}
+
+        {/* Chart principal */}
+        <div className="mt-4 rounded-3xl border border-white/10 bg-black/25 p-2 sm:p-3">
+          <div
+            ref={mainContainerRef}
+            className="h-[420px] w-full rounded-2xl"
+          />
         </div>
 
-        <div
-          ref={investedContainerRef}
-          className="w-full overflow-hidden rounded-xl"
-          style={{ height: 220 }}
-        />
-      </div>
+        {/* Extremos */}
+        {profitExtrema && (
+          <div className="mt-4 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">
+                Máximo (PnL)
+              </div>
+              <div className="mt-1 font-semibold text-emerald-300">
+                {formatCurrency(profitExtrema.max.value)}
+              </div>
+              <div className="mt-1 text-[11px] text-slate-400">
+                {profitExtrema.max.timeLabel}
+              </div>
+            </div>
 
-      {/* Footer mini */}
-      <div className="mt-4 text-[11px] text-slate-500">
-        Lucro atual:{" "}
-        <span className={`font-semibold ${profitColorClass}`}>
-          {formatCurrency(lastProfit)}
-        </span>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">
+                Mínimo (PnL)
+              </div>
+              <div className="mt-1 font-semibold text-red-300">
+                {formatCurrency(profitExtrema.min.value)}
+              </div>
+              <div className="mt-1 text-[11px] text-slate-400">
+                {profitExtrema.min.timeLabel}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Equity mini panel */}
+        {showEquityPanel && (
+          <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_240px]">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-semibold text-slate-100">Equity</p>
+                <span className="text-[10px] text-slate-400">
+                  investido vs atual
+                </span>
+              </div>
+              <div
+                ref={equityContainerRef}
+                className="h-[170px] w-full rounded-2xl"
+              />
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-3">
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">
+                Resumo
+              </div>
+
+              <div className="mt-3 space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Investido</span>
+                  <span className="font-semibold text-slate-100">
+                    {formatCurrency(invested)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Atual</span>
+                  <span className={`font-semibold ${equityColor}`}>
+                    {formatCurrency(equityNow)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">PnL</span>
+                  <span className={`font-semibold ${profitColor}`}>
+                    {formatCurrency(lastProfit)}
+                  </span>
+                </div>
+
+                <div className="pt-2 text-[11px] text-slate-400">
+                  Linha tracejada = investido • linha sólida = equity
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer mini */}
+        {/* <div className="mt-5 text-[11px] text-slate-500">
+          Dica: use o crosshair pra ver preço e lucro no tempo.
+          {loading && <span className="ml-2 text-slate-300">Atualizando…</span>}
+        </div> */}
       </div>
     </div>
   );

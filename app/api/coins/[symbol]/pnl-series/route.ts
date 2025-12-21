@@ -30,7 +30,9 @@ export async function GET(
     const hoursParam = searchParams.get("hours");
     const hours = hoursParam ? Number(hoursParam) : 24 * 30; // 720h
 
-    const since = new Date(Date.now() - hours * 60 * 60 * 1000);
+    const rawSince = Date.now() - hours * 60 * 60 * 1000;
+    const since = new Date(rawSince);
+    since.setSeconds(0, 0);
 
     const symbol = params.symbol.toUpperCase();
 

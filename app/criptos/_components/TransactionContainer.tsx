@@ -1,8 +1,9 @@
 "use client";
 
 import { tokens } from "@/app/_components/data/binanceToken";
-import { Transaction } from "@/app/_components/hooks/TradeForm";
-import TransactionList from "@/app/_components/hooks/TransactionList";
+import { Transaction } from "@/app/_components/transactions/TradeForm";
+import TransactionList from "@/app/_components/transactions/TransactionList";
+
 import { useState, useEffect } from "react";
 
 export default function TransactionContainer() {

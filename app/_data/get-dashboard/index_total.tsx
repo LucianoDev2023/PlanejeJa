@@ -1,7 +1,7 @@
-import { db } from "@/app/_lib/prisma";
 import { TransactionType } from "@prisma/client";
 import { TotalExpensePerCategory, TransactionPercentagePerType } from "./types";
 import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/prisma/client";
 
 export const getDashboardTotal = async (
   month: string,
@@ -57,7 +57,7 @@ export const getDashboardTotal = async (
 
   const depositsTotal = Number(
     (
-      await db.transaction.aggregate({
+      await prisma.transaction.aggregate({
         where: { ...queryFilter, type: "DEPOSIT" },
         _sum: { amount: true },
       })
@@ -65,7 +65,7 @@ export const getDashboardTotal = async (
   );
   const investmentsTotal = Number(
     (
-      await db.transaction.aggregate({
+      await prisma.transaction.aggregate({
         where: { ...queryFilter, type: "INVESTMENT" },
         _sum: { amount: true },
       })
@@ -74,7 +74,7 @@ export const getDashboardTotal = async (
 
   const expensesTotal = Number(
     (
-      await db.transaction.aggregate({
+      await prisma.transaction.aggregate({
         where: { ...queryFilter, type: "EXPENSE" },
         _sum: { amount: true },
       })
@@ -86,7 +86,7 @@ export const getDashboardTotal = async (
 
   const transactionsTotal = Number(
     (
-      await db.transaction.aggregate({
+      await prisma.transaction.aggregate({
         where,
         _sum: { amount: true },
       })
@@ -141,7 +141,7 @@ export const getDashboardTotal = async (
   };
 
   const totalExpensePerCategory: TotalExpensePerCategory[] = (
-    await db.transaction.groupBy({
+    await prisma.transaction.groupBy({
       by: ["category"],
       where: {
         ...where,
@@ -158,7 +158,7 @@ export const getDashboardTotal = async (
       (Number(category._sum.amount) / Number(expensesTotal)) * 100,
     ),
   }));
-  const lastTransactions = await db.transaction.findMany({
+  const lastTransactions = await prisma.transaction.findMany({
     where,
     orderBy: { date: "desc" },
     take: 10,

@@ -1,23 +1,16 @@
-import { z } from "zod";
 import {
   TransactionCategory,
   TransactionPaymentMethod,
   TransactionType,
 } from "@prisma/client";
+import { z } from "zod";
 
 export const upsertTransactionSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1),
+  name: z.string().trim().min(1),
   amount: z.number().positive(),
-
   type: z.nativeEnum(TransactionType),
   category: z.nativeEnum(TransactionCategory),
   paymentMethod: z.nativeEnum(TransactionPaymentMethod),
-
-  // aceita Date ou string do client e normaliza
-  date: z
-    .union([z.date(), z.string()])
-    .transform((v) => (v instanceof Date ? v : new Date(v))),
+  date: z.date(),
+  installments: z.number().optional(), // Deve ser número
 });
-
-export type UpsertTransactionSchema = z.infer<typeof upsertTransactionSchema>;
