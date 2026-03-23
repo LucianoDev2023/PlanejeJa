@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { formatTokenPrice } from "@/app/_utils/currency";
+
 import {
   Select,
   SelectContent,
@@ -194,8 +196,9 @@ export default function TradeForm({
 
           <p className="pt-1 text-[10px] text-blue-400 sm:text-xs">
             {tokenPrices[selectedToken]
-              ? `Preço Atual: $${tokenPrices[selectedToken]}`
+              ? `Preço Atual: ${formatTokenPrice(tokenPrices[selectedToken])}`
               : "Carregando..."}
+
           </p>
         </div>
 

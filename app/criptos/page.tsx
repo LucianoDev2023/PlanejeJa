@@ -12,15 +12,11 @@ export default async function Criptos() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col justify-between">
+    <div className="flex min-h-screen flex-col bg-[#020617]">
       <Navbar />
-      <div className="flex w-full flex-1 flex-col overflow-y-auto bg-gradient-to-b from-[#0D141A] to-[#080b14] pb-28 sm:pb-10 md:mt-0">
+      <main className="flex-1 overflow-x-hidden pb-10">
         <TransactionContainer />
-      </div>
-      {/* Rodapé com o Tour */}
-      <div className="fixed bottom-0 w-full bg-[#060D13] shadow-inner">
-        {/* <TradeFormTour /> */}
-      </div>
+      </main>
     </div>
   );
 }

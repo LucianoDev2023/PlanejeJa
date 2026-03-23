@@ -10,122 +10,109 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import { Menu, LayoutDashboard, LogOut, TrendingUp, LineChart } from "lucide-react";
 
-interface NavbarProps {
-  logoClass?: string;
-  inicioClass?: string;
-  transacoesClass?: string;
-  criptosClass?: string;
-  assinaturaClass?: string;
-}
-
-const Navbar = ({
-  logoClass = "",
-  inicioClass = "",
-  transacoesClass = "",
-  criptosClass = "",
-  assinaturaClass = "",
-}: NavbarProps) => {
+const Navbar = () => {
   const pathname = usePathname();
   const { signOut } = useAuth();
 
   const links = [
-    { href: "/", label: "Início", className: inicioClass },
-    { href: "/transactions", label: "Transações", className: transacoesClass },
-    { href: "/criptos", label: "Criptos", className: criptosClass },
-    { href: "/subscription", label: "Assinaturas", className: assinaturaClass },
+    { href: "/criptos", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
+    { href: "/patrimonio", label: "Patrimônio", icon: <TrendingUp size={16} /> },
+    { href: "/evolucao", label: "Evolução", icon: <LineChart size={16} /> },
   ];
 
-  const isHome = pathname === "/";
-
   return (
-    <nav className="flex items-center justify-between border-b border-solid bg-gradient-to-b from-[#0b1219] to-[#040b11] px-2 py-2 sm:px-4 sm:py-2">
+    <nav className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/5 bg-[#020617]/80 px-4 backdrop-blur-xl sm:px-8">
       {/* LOGO */}
-      <div className="flex items-center">
-        {isHome ? (
-          <div
-            className={`flex items-center justify-center gap-2 text-white/90 sm:text-white/70 ${logoClass}`}
-          >
-            <Image
-              src="/New11.png"
-              alt="Planeje Já"
-              className="w-12 opacity-80 sm:w-16 lg:w-16"
-              width={50}
-              height={64}
-            />
-            <p className="font-sans text-sm font-semibold">PlanejeJá</p>
-          </div>
-        ) : (
-          <Link href="/">
-            <div
-              className={`flex items-center justify-center gap-2 text-white/90 sm:text-white/70 ${logoClass}`}
-            >
-              <Image
-                src="/New11.png"
-                alt="Planeje Já"
-                className="w-12 opacity-80 sm:w-16 lg:w-16"
-                width={100}
-                height={64}
-              />
-              <p className="font-sans text-sm font-semibold">PlanejeJá</p>
-            </div>
-          </Link>
-        )}
-      </div>
+      <Link href="/criptos" className="group flex items-center gap-3 transition-all hover:opacity-90">
+        <div className="relative">
+          <div className="absolute -inset-1 rounded-full bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Image
+            src="/New11.png"
+            alt="Planeje Já"
+            className="relative w-10 sm:w-12"
+            width={48}
+            height={48}
+          />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-sans text-sm font-bold tracking-tight text-white sm:text-base">
+            Planeje<span className="text-primary">Já</span>
+          </span>
+          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">
+            Crypto Assets
+          </span>
+        </div>
+      </Link>
 
       {/* MENU DESKTOP */}
-      <div className="hidden items-center gap-6 sm:flex">
-        {links.map(({ href, label, className }) => (
+      <div className="hidden items-center gap-8 sm:flex">
+        {links.map(({ href, label, icon }) => (
           <Link
             key={href}
             href={href}
-            className={`${
+            className={`flex items-center gap-2 text-sm font-bold transition-all ${
               pathname === href
-                ? "font-bold text-primary"
-                : "text-muted-foreground"
-            } ${className}`}
+                ? "neon-text-blue"
+                : "text-slate-400 hover:text-white"
+            }`}
           >
+            {icon}
             {label}
           </Link>
         ))}
-        <UserButton showName />
+        <div className="h-4 w-[1px] bg-white/10" />
+        <UserButton 
+          afterSignOutUrl="/login"
+          appearance={{
+            elements: {
+              userButtonAvatarBox: "h-8 w-8 ring-2 ring-primary/20 ring-offset-2 ring-offset-[#020617]",
+            }
+          }}
+        />
       </div>
 
       {/* MENU MOBILE */}
-      <div className="flex items-center justify-center gap-3 sm:hidden">
-        <UserButton showName />
-
+      <div className="flex items-center gap-4 sm:hidden">
+        <UserButton afterSignOutUrl="/login" />
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center rounded-lg border-2 bg-gradient-to-b from-[#213243] to-[#040b11] p-1 focus:outline-none">
-              <Menu className="text-gray-400" size={24} />
+            <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary/50">
+              <Menu size={20} />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="mr-4 w-40 border-2 border-[#213243] bg-gradient-to-t from-[#1a2a3a] to-[#040b11]">
-            {links.map(({ href, label, className }) => (
+          <DropdownMenuContent align="end" className="w-48 rounded-2xl border-white/10 bg-[#020617] p-2 shadow-2xl backdrop-blur-xl">
+            {links.map(({ href, label, icon }) => (
               <DropdownMenuItem key={href} asChild>
                 <Link
                   href={href}
-                  className={`${
+                  className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold transition-all ${
                     pathname === href
-                      ? "font-bold text-primary"
-                      : "text-muted-foreground"
-                  } ${className}`}
+                      ? "bg-primary/20 text-primary"
+                      : "text-slate-400 hover:bg-white/5"
+                  }`}
                 >
+                  {icon}
                   {label}
                 </Link>
               </DropdownMenuItem>
             ))}
 
-            <DropdownMenuItem asChild onClick={() => signOut()}>
-              <span className="cursor-pointer text-red-500">Sair</span>
+            <div className="my-2 h-[1px] bg-white/5" />
+
+            <DropdownMenuItem 
+              onClick={() => signOut()}
+              className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold text-rose-500 hover:bg-rose-500/10 cursor-pointer"
+            >
+              <LogOut size={16} />
+              Sair
             </DropdownMenuItem>
-            <DropdownMenuItem className="mt-2 items-center justify-center">
-              <p className="text-center text-xs text-white/40">
-                Versão 1.5.0 ©2025
-              </p>
-            </DropdownMenuItem>
+            
+            <div className="mt-2 px-3 pb-1 text-[10px] font-medium text-slate-600">
+              Versão 2.1.0 ©2026
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -1,10 +1,9 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { motion } from "framer-motion";
-import { ArrowUpRight, ArrowDownRight, LineChart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight, ArrowDownRight, LineChart, Layers, ShoppingBag, DollarSign } from "lucide-react";
 
-// 🔹 Tipo centralizado para não dar divergência
 export type TransactionFilterValue =
   | "all"
   | "buy"
@@ -19,27 +18,16 @@ interface TransactionFilterToggleProps {
 }
 
 const filters: {
-  label?: string;
-  icon?: ReactNode;
+  label: string;
+  icon: ReactNode;
   value: TransactionFilterValue;
+  color?: string;
 }[] = [
-  { label: "Todas", value: "all" },
-  { label: "Compras", value: "buy" },
-  { label: "Vendas", value: "sell" },
-
-  {
-    icon: <ArrowUpRight size={14} className="rounded-md text-green-500" />,
-    value: "positive",
-  },
-  {
-    icon: <ArrowDownRight size={14} className="text-red-500" />,
-    value: "negative",
-  },
-  {
-    label: "Gráficos",
-    icon: <LineChart size={14} className="text-sky-400" />,
-    value: "chart",
-  },
+  { label: "Todas", icon: <Layers size={14} />, value: "all" },
+  { label: "Compras", icon: <ShoppingBag size={14} />, value: "buy" },
+  { label: "Vendas", icon: <DollarSign size={14} />, value: "sell" },
+  { label: "Profit", icon: <ArrowUpRight size={14} />, value: "positive", color: "text-emerald-400" },
+  { label: "Loss", icon: <ArrowDownRight size={14} />, value: "negative", color: "text-rose-400" },
 ];
 
 export default function TransactionFilterToggle({
@@ -47,42 +35,35 @@ export default function TransactionFilterToggle({
   onChange,
 }: TransactionFilterToggleProps) {
   return (
-    <div className="relative mx-2 my-2 flex w-fit items-center justify-center rounded-lg bg-gray-900 p-[2px] px-1 py-0.5">
-      {filters.map((filter) => {
-        const isActive = value === filter.value;
+    <div className="flex w-full items-center justify-start overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+      <div className="flex h-11 items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-xl">
+        {filters.map((filter) => {
+          const isActive = value === filter.value;
 
-        return (
-          <button
-            key={filter.value}
-            onClick={() => onChange(filter.value)}
-            className={`relative z-10 flex items-center justify-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none transition-all duration-300 md:text-xs xl:text-sm ${
-              isActive ? "text-white" : "text-gray-500"
-            }`}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="toggle"
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="absolute inset-0 z-[-1] rounded-md bg-gradient-to-t from-[#0b1529] to-[#10c1edc5]"
-              />
-            )}
-
-            {filter.icon && (
-              <span
-                className={`${
-                  filter.value === "positive" ? "text-green-500" : ""
-                } ${
-                  filter.value === "negative" ? "text-red-500" : ""
-                } ${!isActive ? "opacity-60" : ""}`}
-              >
+          return (
+            <button
+              key={filter.value}
+              onClick={() => onChange(filter.value)}
+              className={`relative flex h-full items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                isActive ? "text-white" : "text-slate-500 hover:text-slate-300"
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="active-filter"
+                  className="absolute inset-0 rounded-xl bg-primary/20 ring-1 ring-primary/40 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              
+              <span className={`relative z-10 ${isActive ? (filter.color || 'text-primary') : 'opacity-70'}`}>
                 {filter.icon}
               </span>
-            )}
-
-            {filter.label}
-          </button>
-        );
-      })}
+              <span className="relative z-10">{filter.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

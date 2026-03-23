@@ -26,7 +26,10 @@ const getAveragePrices = async (symbol: string, intervals: string[]) => {
         const averagePrice =
           closePrices.reduce((acc: number, price: number) => acc + price, 0) /
           closePrices.length;
-        averages[interval] = averagePrice.toFixed(2);
+        averages[interval] = averagePrice.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 8,
+        });
       } else {
         averages[interval] = null;
       }

@@ -1,6 +1,6 @@
 "use client";
 
-import CustomTooltip from "@/app/(home)/_actions/tour/components/CustomTooltip";
+// import CustomTooltip from "@/app/(home)/_actions/tour/components/CustomTooltip";
 import { useEffect, useState } from "react";
 import Joyride, { Step, CallBackProps, STATUS } from "react-joyride";
 
@@ -83,9 +83,6 @@ export default function TradeFormTour() {
         showProgress
         showSkipButton
         callback={handleJoyrideCallback}
-        tooltipComponent={(props) => (
-          <CustomTooltip {...props} totalSteps={steps.length} />
-        )}
         styles={{ options: { zIndex: 9999 } }}
       />
     </>

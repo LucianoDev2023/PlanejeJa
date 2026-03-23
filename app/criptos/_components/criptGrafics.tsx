@@ -1,6 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
 
-// Definindo o tipo para os dados da resposta da API
+import { useState, useEffect, useCallback } from "react";
+import { TrendingUp, Clock, Globe } from "lucide-react";
+import { formatTokenPrice } from "@/app/_utils/currency";
+
+
 interface TokenPrices {
   [key: string]: string;
 }
@@ -16,65 +20,64 @@ const TokenPriceChart: React.FC<TokenPriceChartProps> = ({ selectedToken }) => {
 
   const fetchPrices = useCallback(async (token: string) => {
     setLoading(true);
-    setError(null); // Reset error on new fetch
+    setError(null);
     try {
       const response = await fetch(`/api/getAverages?symbol=${token}`);
-
-      // Verifica se a resposta é bem-sucedida
-      if (!response.ok) {
-        throw new Error(`Erro ao buscar dados, status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`Erro: ${response.status}`);
       const data: TokenPrices = await response.json();
-
-      // Verifica se o retorno contém dados válidos
       if (data && Object.keys(data).length > 0) {
         setPrices(data);
       } else {
-        setError("Nenhum dado encontrado para o token selecionado.");
+        setError("Sem dados");
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(`Ocorreu um erro: ${error.message}`);
-      } else {
-        console.error("Erro desconhecido:", error);
-        setError("Ocorreu um erro desconhecido.");
-      }
+      setError("Erro ao carregar");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (selectedToken) {
-      fetchPrices(selectedToken);
-    }
+    if (selectedToken) fetchPrices(selectedToken);
   }, [selectedToken, fetchPrices]);
 
-  // Renderização condicional
-  if (loading) return <p className="text-[10px]">Carregando médias...</p>;
-  if (error) return <p>{error}</p>;
-  if (!prices || Object.keys(prices).length === 0)
-    return (
-      <p className="text-[10px]">Sem dados para o token {selectedToken}.</p>
-    );
+  if (loading) return (
+    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5 animate-pulse">
+      <div className="h-2 w-20 bg-white/10 rounded" />
+    </div>
+  );
+  
+  if (error || !prices) return null;
 
   return (
-    <div className="mt-1 flex w-full items-center justify-center gap-2 sm:mt-4">
-      <p className="text-[8px] text-orange-500">Preços médios:</p>
-      <p className="text-[8px] text-gray-300">
-        <span className="text-cyan-400">15 min:</span> ${prices["15m"]}
-      </p>
-      <p className="text-[8px] text-gray-300">
-        <span className="text-yellow-500">1 hora:</span> ${prices["1h"]}
-      </p>
-      <p className="text-[8px] text-gray-300">
-        <span className="text-lime-500">4 horas:</span> ${prices["4h"]}
-      </p>
-      <p className="text-[8px] text-gray-300">
-        <span className="text-purple-500">1 dia:</span> ${prices["1d"]}
-      </p>
-      <p className="pl-6 text-[8px] text-gray-700">Fonte: Binance</p>
+    <div className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-2 backdrop-blur-md">
+      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+        <TrendingUp size={12} className="text-primary" /> Médias
+      </div>
+      
+      <div className="h-3 w-[1px] bg-white/10" />
+
+      <div className="flex items-center gap-4">
+        {[
+          { label: "15m", value: prices["15m"], color: "text-cyan-400" },
+          { label: "1h", value: prices["1h"], color: "text-yellow-400" },
+          { label: "4h", value: prices["4h"], color: "text-emerald-400" },
+          { label: "1d", value: prices["1d"], color: "text-fuchsia-400" },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center gap-1.5">
+            <span className="text-[9px] font-bold text-slate-500 uppercase">{item.label}</span>
+            <span className={`text-[10px] font-bold ${item.color}`}>
+              {formatTokenPrice(item.value)}
+            </span>
+
+          </div>
+        ))}
+      </div>
+
+      <div className="ml-auto flex items-center gap-1.5 text-[9px] font-medium text-slate-600">
+        <Globe size={10} />
+        Binance API
+      </div>
     </div>
   );
 };

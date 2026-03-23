@@ -16,16 +16,6 @@ import { NextResponse } from "next/server";
 
 // Criando um middleware customizado que inclui o Clerk e o tratamento do webhook
 const customMiddleware = clerkMiddleware((auth, req) => {
-  // Desabilitar o processamento automático do Next.js para o webhook da Stripe
-  if (req.method === "POST" && req.nextUrl.pathname === "/api/webhooks/hook") {
-    return NextResponse.next({
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
-
-  // Se não for o webhook, apenas continue com o Clerk normalmente
   return NextResponse.next();
 });
 

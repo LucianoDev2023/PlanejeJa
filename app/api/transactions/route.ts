@@ -12,21 +12,42 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const transaction = await prisma.cryptoTransaction.create({
-      data: {
-        token: body.token,
-        type: body.type,
-        usdValue: body.usdValue,
-        amount: body.amount,
-        price: body.price,
-        date: new Date(body.date),
-        sellTokenPrice: body.sellTokenPrice || null,
-        profitSell: body.profitSell || null,
-        userId, // 👈 associa ao usuário logado
-      },
+    // 15. Criar transação e atualizar saldo em uma TRANSACTION atômica
+    const result = await prisma.$transaction(async (tx) => {
+      const cryptoTx = await tx.cryptoTransaction.create({
+        data: {
+          token: body.token,
+          type: body.type,
+          usdValue: String(body.usdValue),
+          amount: String(body.amount),
+          price: String(body.price),
+          date: new Date(body.date),
+          sellTokenPrice: body.sellTokenPrice || null,
+          profitSell: body.profitSell || null,
+          userId,
+        },
+      });
+
+      // Atualizar saldo da carteira
+      const delta = parseFloat(body.usdValue);
+      const balanceChange = body.type === "buy" ? -delta : delta;
+
+      await (tx as any).userWallet.upsert({
+        where: { userId },
+        update: {
+          availableBalance: { increment: balanceChange },
+        },
+        create: {
+          userId,
+          availableBalance: balanceChange,
+        },
+      });
+
+      return cryptoTx;
     });
 
-    return NextResponse.json(transaction, { status: 201 });
+    return NextResponse.json(result, { status: 201 });
+
   } catch (error) {
     console.error("❌ Erro ao criar transação:", error);
     return NextResponse.json(

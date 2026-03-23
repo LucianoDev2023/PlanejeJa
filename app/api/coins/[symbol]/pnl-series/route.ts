@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/prisma/client";
 import { auth } from "@clerk/nextjs/server";
+import { unstable_cache } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -30,41 +31,50 @@ export async function GET(
     const hoursParam = searchParams.get("hours");
     const hours = hoursParam ? Number(hoursParam) : 24 * 30; // 720h
 
-    const rawSince = Date.now() - hours * 60 * 60 * 1000;
+    const now = Date.now();
+    const fiveMinutesMs = 5 * 60 * 1000;
+    const roundedNow = Math.floor(now / fiveMinutesMs) * fiveMinutesMs;
+    
+    const rawSince = roundedNow - hours * 60 * 60 * 1000;
     const since = new Date(rawSince);
     since.setSeconds(0, 0);
 
     const symbol = params.symbol.toUpperCase();
 
-    // 1) Snapshots horários dessa moeda no período
-    const snapshots = await prisma.priceSnapshot.findMany({
-      where: {
+    const fetchData = unstable_cache(
+      async () => {
+        const snapshots = await prisma.priceSnapshot.findMany({
+          where: {
+            symbol,
+            capturedAt: { gte: since },
+          },
+          orderBy: { capturedAt: "asc" },
+        });
+
+        const transactions = await prisma.cryptoTransaction.findMany({
+          where: {
+            token: symbol,
+            userId,
+            profitSell: null, // APENAS OPERAÇÕES ATIVAS (HOLD)
+            ...(operationId ? { id: operationId } : {}),
+          },
+        });
+
+        return { snapshots, transactions };
+      },
+      [
+        "pnl-series",
+        userId!,
         symbol,
-        capturedAt: {
-          gte: since,
-        },
-      },
-      orderBy: {
-        capturedAt: "asc",
-      },
-    });
+        String(since.getTime()),
+        operationId || "",
+      ],
+      { revalidate: 60 },
+    );
 
-    if (snapshots.length === 0) {
-      return NextResponse.json({ data: [] }, { status: 200 });
-    }
+    const { snapshots, transactions } = await fetchData();
 
-    // 2) Transações dessa moeda para o usuário logado
-    const txWhere = {
-      token: symbol,
-      userId,
-      ...(operationId ? { id: operationId } : {}),
-    };
-
-    const transactions = await prisma.cryptoTransaction.findMany({
-      where: txWhere,
-    });
-
-    if (transactions.length === 0) {
+    if (!snapshots.length || !transactions.length) {
       return NextResponse.json({ data: [] }, { status: 200 });
     }
 

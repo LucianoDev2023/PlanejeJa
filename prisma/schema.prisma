@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
+
 
 datasource db {
   provider = "postgresql"
@@ -21,6 +21,48 @@ model Transaction {
   userId        String
 }
 
+model CryptoTransaction {
+  id             String   @id @default(uuid())
+  token          String
+  type           String
+  usdValue       String
+  amount         String
+  price          String
+  date           DateTime @default(now())
+  sellTokenPrice String?
+  profitSell     String?
+  userId         String
+}
+
+model PriceSnapshot {
+  id         String   @id @default(uuid())
+  symbol     String
+  priceUsd   Decimal  @db.Decimal(18, 8)
+  capturedAt DateTime
+
+  @@index([symbol, capturedAt])
+}
+
+model PortfolioSnapshot {
+  id            String   @id @default(uuid())
+  userId        String
+  totalValue    Decimal  @db.Decimal(18, 2)
+  investedValue Decimal  @db.Decimal(18, 2)
+  profitValue   Decimal  @db.Decimal(18, 2)
+  timestamp     DateTime @default(now())
+  dateKey       String   @default("") // Formato YYYY-MM-DD
+
+  @@unique([userId, dateKey])
+  @@index([userId, timestamp])
+}
+
+model UserWallet {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  availableBalance Decimal  @db.Decimal(18, 2) @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
 
 enum TransactionType {
   DEPOSIT
@@ -38,7 +80,7 @@ enum TransactionCategory {
   SALARY
   EDUCATION
   OTHER
-  INTEREST 
+  INTEREST
 }
 
 enum TransactionPaymentMethod {
@@ -50,27 +92,3 @@ enum TransactionPaymentMethod {
   PIX
   OTHER
 }
-
-model CryptoTransaction {
-  id              String   @id @default(uuid())
-  token           String
-  type            String
-  usdValue        String
-  amount          String
-  price           String
-  date            DateTime @default(now())
-  sellTokenPrice  String?
-  profitSell      String?
-  userId          String   // <-- novo campo obrigatório
-}
-
-
-model PriceSnapshot {
-  id         String   @id @default(uuid())
-  symbol     String
-  priceUsd   Decimal  @db.Decimal(18, 8)
-  capturedAt DateTime
-
-  @@index([symbol, capturedAt])
-}
-

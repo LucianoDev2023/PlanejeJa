@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Card, CardContent } from "../ui/card";
 import { Transaction } from "./TradeForm";
 import { Trash2, Pencil, Loader2 } from "lucide-react";
+import { formatCurrency, formatTokenPrice } from "@/app/_utils/currency";
+
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -39,11 +41,12 @@ export default function TransactionCard({
   const displayedProfit =
     transaction.type === "buy"
       ? !isNaN(profitBuy)
-        ? `$${profitBuy.toFixed(2)}`
+        ? formatCurrency(profitBuy)
         : " -"
       : !isNaN(profitSell)
-        ? `$${profitSell.toFixed(2)}`
+        ? formatCurrency(profitSell)
         : " -";
+
 
   const profitPercent =
     transaction.type === "buy"
@@ -97,8 +100,9 @@ export default function TransactionCard({
                   ? "Compra em USD:"
                   : "Venda em USD:"}
               </strong>{" "}
-              ${transaction.usdValue}
+              {formatCurrency(investedValue)}
             </p>
+
 
             <p className="col-span-1 break-words text-xs">
               <strong>Qtd. Tokens:</strong>{" "}
@@ -106,19 +110,22 @@ export default function TransactionCard({
             </p>
 
             <p className="col-span-1 break-words text-xs">
-              <strong>Preço na Compra:</strong> ${transaction.price}
+              <strong>Preço na Compra:</strong> {formatTokenPrice(transaction.price)}
             </p>
+
 
             {transaction.type === "sell" && transaction.sellTokenPrice && (
               <p className="col-span-1 break-words text-xs">
-                <strong>Preço na Venda:</strong> ${transaction.sellTokenPrice}
+                <strong>Preço na Venda:</strong> {formatTokenPrice(transaction.sellTokenPrice)}
               </p>
+
             )}
 
             {transaction.type === "buy" && (
               <p className="col-span-1 break-words text-xs">
-                <strong>Preço Atual:</strong> ${Number(priceNow).toString()}
+                <strong>Preço Atual:</strong> {formatTokenPrice(priceNow)}
               </p>
+
             )}
 
             <div className="col-span-2 flex items-center justify-between gap-3 md:col-span-1">

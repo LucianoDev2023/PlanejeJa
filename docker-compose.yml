@@ -1,0 +1,177 @@
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: always
+    networks:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.toml:/traefik.toml:ro
+      - ./traefik/traefik_dynamic.toml:/traefik_dynamic.toml:ro
+      - ./traefik/acme.json:/acme.json
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/portainer/data:/data
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+      - "9443:9443"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.planejeja.com.br`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  minha-app:
+    build:
+      context: ./app-planejeja
+    image: minha-next-app:latest
+    container_name: minha-next-app
+    restart: always
+    networks:
+      - web
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.minhaapp.rule=Host(`planejeja.com.br`)"
+      - "traefik.http.routers.minhaapp.entrypoints=websecure"
+      - "traefik.http.routers.minhaapp.tls=true"
+      - "traefik.http.routers.minhaapp.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.minhaapp.loadbalancer.server.port=3000"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  event-link:
+    build:
+      context: ../static-link
+    container_name: event-link
+    restart: unless-stopped
+    networks:
+      - web
+
+    # ✅ Servindo arquivos da pasta raiz fora do diretório docker
+    volumes:
+      - /root/static-link:/usr/share/nginx/html:ro
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+
+      # ✅ rota só para arquivos do link/convite
+      - "traefik.http.routers.eventlink.rule=Host(`planejeja.com.br`) && (Path(`/app.html`) || Path(`/logo.png`) || PathPrefix(`/download`))"
+      - "traefik.http.routers.eventlink.entrypoints=websecure"
+      - "traefik.http.routers.eventlink.tls=true"
+      - "traefik.http.routers.eventlink.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.eventlink.loadbalancer.server.port=80"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  plannix-sign:
+    build:
+      context: ./plannix-sign
+    container_name: plannix-sign
+    restart: unless-stopped
+    environment:
+      PORT: "3333"
+      # Ajustado para aceitar requisições do App e Web
+      ALLOWED_CORS_ORIGIN: ""
+      DEFAULT_FOLDER: "plannix/events"
+      # Chaves atualizadas do seu .env
+      CLOUDINARY_CLOUD_NAME: "djxmv3lkq"
+      CLOUDINARY_API_KEY: "719221955329617"
+      CLOUDINARY_API_SECRET: "bQRbN0FCYOcx7ypWWA-LHZKHM0c"
+      GOOGLE_APPLICATION_CREDENTIALS: "/run/secrets/firebase_admin"
+    secrets:
+      - firebase_admin
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.plannix-sign.rule=Host(`api.iafast.com.br`)"
+      - "traefik.http.routers.plannix-sign.entrypoints=websecure"
+      - "traefik.http.routers.plannix-sign.tls=true"
+      - "traefik.http.routers.plannix-sign.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.plannix-sign.loadbalancer.server.port=3333"
+
+  plannix-legal:
+    image: nginx:alpine
+    container_name: plannix-legal
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - /opt/plannix-legal/plannix-legal-site/public:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.plannix-legal.rule=Host(`legal.iafast.com.br`)"
+      - "traefik.http.routers.plannix-legal.entrypoints=websecure"
+      - "traefik.http.routers.plannix-legal.tls=true"
+      - "traefik.http.routers.plannix-legal.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.plannix-legal.loadbalancer.server.port=80"
+
+  lembremed-api:
+    build:
+      context: ./lembremed-api
+    container_name: lembremed-api
+    restart: unless-stopped
+    networks:
+      - web
+    env_file:
+      - .env
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: "/run/secrets/firebase_admin_lembremed"
+    secrets:
+      - firebase_admin_lembremed
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.lembremed.rule=Host(`api-medical.iafast.com.br`)"
+      - "traefik.http.routers.lembremed.entrypoints=websecure"
+      - "traefik.http.routers.lembremed.tls=true"
+      - "traefik.http.routers.lembremed.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.lembremed.loadbalancer.server.port=3000"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  web:
+    external: true
+
+secrets:
+  firebase_admin:
+    file: /opt/plannix-sign/secrets/firebase-admin.json
+  firebase_admin_lembremed:
+    file: /opt/lembremed/secrets/firebase-admin-lembremed.json
